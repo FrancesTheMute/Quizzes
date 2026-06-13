@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Quiz – Lesson 1</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F7F9FC; color: #222; }
+  header { background: linear-gradient(135deg, #2E4A8C, #1a2d5a); color: white; padding: 20px 28px; }
+  header .sub { font-size: 12px; color: #99B2E0; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  header h1 { font-size: 22px; font-weight: 700; }
+  nav { display: flex; background: #1a2d5a; padding: 0 28px; }
+  nav button { padding: 10px 16px; border: none; background: transparent; color: #99B2E0; cursor: pointer; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; }
+  nav button.active { color: white; border-bottom-color: white; }
+  .page { display: none; padding: 28px; max-width: 820px; margin: 0 auto; }
+  .page.active { display: block; }
+  .card { background: white; border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .card.correct { border-left: 4px solid #15803d; }
+  .card.wrong { border-left: 4px solid #dc2626; }
+  .card.neutral { border-left: 4px solid #2E4A8C; }
+  .tag { display: inline-block; background: #EEF2FA; color: #2E4A8C; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+  .btn { padding: 9px 22px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; }
+  .btn-primary { background: #2E4A8C; color: white; }
+  .btn-secondary { background: #f1f5f9; color: #555; }
+  .btn-green { background: #dcfce7; color: #15803d; }
+  .btn-red { background: #fee2e2; color: #b91c1c; }
+  .feedback { margin-top: 10px; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+  .feedback.ok { background: #f0fdf4; color: #15803d; }
+  .feedback.bad { background: #fef2f2; color: #dc2626; }
+  .mc-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .mc-btn { padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 14px; text-align: left; transition: all 0.15s; }
+  .mc-btn:hover:not(:disabled) { border-color: #2E4A8C; background: #EEF2FA; }
+  .mc-btn.chosen-correct { border-color: #15803d; background: #dcfce7; color: #15803d; font-weight: 700; }
+  .mc-btn.chosen-wrong { border-color: #dc2626; background: #fee2e2; color: #dc2626; }
+  .mc-btn.reveal-correct { border-color: #15803d; background: #f0fdf4; }
+  progress-bar { display: block; background: #EEF2FA; border-radius: 8px; height: 10px; margin: 10px 0 20px; overflow: hidden; }
+  .progress-inner { height: 10px; background: linear-gradient(90deg,#2E4A8C,#4a7fd4); border-radius: 8px; transition: width 0.4s; }
+  .score-big { font-size: 52px; font-weight: 800; color: #2E4A8C; }
+  .score-label { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .collocation-word { display: inline-block; background: #2E4A8C; color: white; padding: 6px 14px; border-radius: 8px; margin: 4px; cursor: grab; font-size: 14px; font-weight: 600; user-select: none; }
+  .collocation-word.used { opacity: 0.3; cursor: default; }
+  .drop-zone { border: 2px dashed #99B2E0; border-radius: 8px; min-height: 44px; padding: 8px 12px; margin-top: 6px; font-size: 14px; color: #888; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .drop-zone.filled { border-color: #2E4A8C; color: #222; }
+  .placed-word { background: #EEF2FA; color: #2E4A8C; padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .placed-word:hover { background: #fee2e2; color: #dc2626; }
+  h2 { font-size: 18px; font-weight: 700; color: #2E4A8C; margin-bottom: 6px; }
+  .hint { font-size: 13px; color: #666; margin-bottom: 16px; font-style: italic; }
+  .word-bold { font-weight: 700; color: #1a2d5a; }
+  .num { font-weight: 700; color: #2E4A8C; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sub">Klasse 11 · Englisch</div>
+  <h1>Advanced Vocabulary · Quiz</h1>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab(0)">🎯 Multiple Choice</button>
+  <button onclick="showTab(1)">🔗 Collocations</button>
+  <button onclick="showTab(2)">🌍 In Context</button>
+  <button onclick="showTab(3)">📊 Score</button>
+</nav>
+
+<div class="page active" id="tab0">
+  <h2>Part 1 – Multiple Choice</h2>
+  <p class="hint">Choose the word that matches each definition.</p>
+  <div id="mc-container"></div>
+  <button class="btn btn-primary" onclick="checkMC()" style="margin-top:8px">Check All</button>
+  <div id="mc-score" style="margin-top:12px;font-weight:700;color:#2E4A8C;font-size:15px"></div>
+</div>
+
+<div class="page" id="tab1">
+  <h2>Part 2 – Collocations</h2>
+  <p class="hint">Click a word from the bank, then click the correct gap to place it. Click a placed word to remove it.</p>
+  <div id="word-bank" style="margin-bottom:20px;padding:14px;background:white;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,0.07)"></div>
+  <div id="colloc-container"></div>
+  <button class="btn btn-primary" onclick="checkCollocations()" style="margin-top:8px">Check</button>
+  <div id="colloc-score" style="margin-top:12px;font-weight:700;color:#2E4A8C;font-size:15px"></div>
+</div>
+
+<div class="page" id="tab2">
+  <h2>Part 3 – Odd One Out</h2>
+  <p class="hint">Three of the four sentences use the word correctly. Find the ONE that is WRONG.</p>
+  <div id="context-container"></div>
+</div>
+
+<div class="page" id="tab3">
+  <h2>Your Score</h2>
+  <div class="card" style="text-align:center;padding:30px">
+    <div class="score-label">Total</div>
+    <div class="score-big" id="total-score">–</div>
+    <div style="color:#888;font-size:15px" id="total-label">Complete the exercises first</div>
+    <div style="background:#EEF2FA;border-radius:8px;height:12px;margin-top:16px;overflow:hidden">
+      <div class="progress-inner" id="total-bar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="card" style="background:#EEF2FA;border:none">
+    <p style="font-size:14px;color:#1a2d5a;line-height:1.7">
+      <strong>📌 Tip:</strong> For words you got wrong, go back to the worksheet reference table and look at the collocations again. Try writing your own sentence with each word you missed.
+    </p>
+  </div>
+</div>
+
+<script>
+const vocab = [
+  { word: "to advocate (for)", definition: "to publicly support or recommend something", type: "v" },
+  { word: "ambiguous", definition: "open to more than one interpretation; unclear", type: "adj" },
+  { word: "to attribute sth to", definition: "to regard something as caused by or belonging to something else", type: "v" },
+  { word: "to be confronted with", definition: "to have to deal with a difficult situation or challenge", type: "phr" },
+  { word: "to challenge", definition: "to question the truth or validity of something", type: "v" },
+  { word: "consequently", definition: "as a result; therefore (used to link cause and effect)", type: "adv" },
+  { word: "to critique", definition: "to evaluate something in a detailed and analytical way", type: "v" },
+  { word: "to depict", definition: "to represent something in a picture or story", type: "v" },
+  { word: "to emphasise", definition: "to give special importance or attention to something", type: "v" },
+  { word: "to imply", definition: "to suggest something without stating it directly", type: "v" },
+  { word: "to jeopardise", definition: "to put something valuable at risk", type: "v" },
+  { word: "nonetheless", definition: "in spite of what has just been said; nevertheless", type: "adv" },
+];
+
+// MC Questions
+const mcQuestions = [
+  { q: "Which word means 'to suggest something without saying it directly'?", correct: "to imply", distractors: ["to depict", "to emphasise", "to attribute sth to"] },
+  { q: "Which word means 'to publicly support a cause or idea'?", correct: "to advocate (for)", distractors: ["to challenge", "to critique", "to jeopardise"] },
+  { q: "Which word describes something that is 'unclear or open to more than one interpretation'?", correct: "ambiguous", distractors: ["nonetheless", "consequently", "confronted"] },
+  { q: "Which word means 'to put something valuable at risk'?", correct: "to jeopardise", distractors: ["to attribute sth to", "to advocate (for)", "to be confronted with"] },
+  { q: "Which word is used to link a cause to its effect in formal writing?", correct: "consequently", distractors: ["nonetheless", "ambiguous", "to depict"] },
+  { q: "Which word means 'to represent something in a film, book, or picture'?", correct: "to depict", distractors: ["to critique", "to challenge", "to emphasise"] },
+  { q: "Which word means 'to evaluate something analytically'?", correct: "to critique", distractors: ["to depict", "to imply", "to advocate (for)"] },
+  { q: "Which word means 'in spite of what was just said'?", correct: "nonetheless", distractors: ["consequently", "ambiguous", "to attribute sth to"] },
+];
+
+// Collocation exercise
+const collocItems = [
+  { sentence: "She ___ for stricter gun control laws.", answer: "advocates", others: ["emphasises", "depicts", "critiques"] },
+  { sentence: "The film ___ life in post-war Germany.", answer: "depicts", others: ["challenges", "implies", "jeopardises"] },
+  { sentence: "His comments were ___ — nobody knew if he was serious or joking.", answer: "ambiguous", others: ["consequently", "nonetheless", "confronted"] },
+  { sentence: "The scandal could ___ the entire peace process.", answer: "jeopardise", others: ["attribute", "emphasise", "critique"] },
+  { sentence: "The factory closed; ___, hundreds of workers lost their jobs.", answer: "consequently", others: ["nonetheless", "ambiguous", "jeopardise"] },
+  { sentence: "She was ___ with an impossible choice.", answer: "confronted", others: ["implied", "depicted", "advocated"] },
+];
+
+// Odd one out (wrong usage)
+const contextQuestions = [
+  {
+    word: "to imply",
+    sentences: [
+      { text: "Her silence implied that she disagreed with the proposal.", correct: true },
+      { text: "The data implies a strong link between diet and health.", correct: true },
+      { text: "He implied to finish the report on time.", correct: false, reason: "After 'imply', you use a clause or noun, not an infinitive. → He implied that he would finish…" },
+      { text: "Are you implying that I made a mistake?", correct: true },
+    ]
+  },
+  {
+    word: "nonetheless",
+    sentences: [
+      { text: "The results were disappointing; nonetheless, the team carried on.", correct: true },
+      { text: "Nonetheless of the rain, they decided to go hiking.", correct: false, reason: "'Nonetheless' is an adverb, not a preposition. → Despite the rain, … / In spite of the rain, …" },
+      { text: "It was a difficult year; nonetheless, she remained optimistic.", correct: true },
+      { text: "The evidence was weak; nonetheless, the jury found him guilty.", correct: true },
+    ]
+  },
+  {
+    word: "to attribute sth to",
+    sentences: [
+      { text: "Researchers attribute the rise in temperatures to CO2 emissions.", correct: true },
+      { text: "She attributed her success to hard work and determination.", correct: true },
+      { text: "The painting is attributed to Rembrandt.", correct: true },
+      { text: "He attributed that the failure was caused by poor management.", correct: false, reason: "After 'attribute', use 'to + noun', not a 'that'-clause. → He attributed the failure to poor management." },
+    ]
+  },
+  {
+    word: "to challenge",
+    sentences: [
+      { text: "The study challenges long-held assumptions about sleep.", correct: true },
+      { text: "She challenged him to a debate.", correct: true },
+      { text: "He was challenged with the new project.", correct: false, reason: "Use 'confronted with' or 'faced with' for difficult situations. → He was confronted with a challenging new project." },
+      { text: "New evidence challenges the official version of events.", correct: true },
+    ]
+  },
+];
+
+// ---- RENDER MC ----
+let mcAnswers = {};
+function renderMC() {
+  const c = document.getElementById('mc-container');
+  c.innerHTML = mcQuestions.map((q, i) => {
+    const opts = shuffle([q.correct, ...q.distractors]);
+    return `<div class="card neutral" id="mc-${i}">
+      <p><span class="num">${i+1}.</span>${q.q}</p>
+      <div class="mc-options">${opts.map(o => `<button class="mc-btn" onclick="pickMC(${i},'${o.replace(/'/g,"\\'")}',this)">${o}</button>`).join('')}</div>
+      <div id="mc-fb-${i}"></div>
+    </div>`;
+  }).join('');
+}
+function pickMC(i, val, btn) {
+  if (mcAnswers[i] && mcAnswers[i].locked) return;
+  mcAnswers[i] = { val, locked: false };
+  document.querySelectorAll(`#mc-${i} .mc-btn`).forEach(b => b.classList.remove('chosen-correct','chosen-wrong'));
+  btn.classList.add('chosen-correct');
+}
+function checkMC() {
+  let score = 0;
+  mcQuestions.forEach((q, i) => {
+    const card = document.getElementById(`mc-${i}`);
+    const fb = document.getElementById(`mc-fb-${i}`);
+    const ans = mcAnswers[i];
+    document.querySelectorAll(`#mc-${i} .mc-btn`).forEach(b => {
+      b.disabled = true;
+      if (b.textContent === q.correct) b.classList.add('reveal-correct');
+    });
+    if (ans && ans.val === q.correct) {
+      score++;
+      card.className = 'card correct';
+      fb.innerHTML = `<div class="feedback ok">✓ Correct!</div>`;
+    } else {
+      card.className = 'card wrong';
+      fb.innerHTML = `<div class="feedback bad">✗ The answer is: <strong>${q.correct}</strong></div>`;
+    }
+    mcAnswers[i] = { ...ans, locked: true };
+  });
+  document.getElementById('mc-score').textContent = `Score: ${score} / ${mcQuestions.length}`;
+  window._mcScore = score;
+}
+
+// ---- RENDER COLLOCATIONS ----
+let selectedWord = null;
+let collocAnswers = {};
+function renderCollocations() {
+  const allWords = shuffle(collocItems.map(c => c.answer));
+  const bank = document.getElementById('word-bank');
+  bank.innerHTML = '<div style="font-weight:700;color:#2E4A8C;margin-bottom:8px;font-size:13px">WORD BANK</div>' +
+    allWords.map(w => `<span class="collocation-word" id="bank-${w}" onclick="selectWord('${w}')">${w}</span>`).join('');
+  const c = document.getElementById('colloc-container');
+  c.innerHTML = collocItems.map((item, i) => {
+    const parts = item.sentence.split('___');
+    return `<div class="card neutral" id="colloc-${i}">
+      <p><span class="num">${i+1}.</span>${parts[0]}<span class="drop-zone" id="drop-${i}" onclick="placeWord(${i})" style="display:inline-flex;min-width:120px;padding:2px 8px;vertical-align:middle"></span>${parts[1]}</p>
+    </div>`;
+  }).join('');
+}
+function selectWord(w) {
+  document.querySelectorAll('.collocation-word').forEach(el => el.style.outline = 'none');
+  selectedWord = w;
+  const el = document.getElementById(`bank-${w}`);
+  if (el && !el.classList.contains('used')) el.style.outline = '3px solid #f59e0b';
+}
+function placeWord(i) {
+  if (!selectedWord) return;
+  const bankEl = document.getElementById(`bank-${selectedWord}`);
+  if (bankEl && bankEl.classList.contains('used')) return;
+  // Remove previous if any
+  if (collocAnswers[i]) {
+    const prev = document.getElementById(`bank-${collocAnswers[i]}`);
+    if (prev) { prev.classList.remove('used'); prev.style.opacity = '1'; }
+  }
+  collocAnswers[i] = selectedWord;
+  const drop = document.getElementById(`drop-${i}`);
+  drop.innerHTML = `<span class="placed-word" onclick="removeWord(${i})">${selectedWord} ✕</span>`;
+  if (bankEl) { bankEl.classList.add('used'); bankEl.style.opacity = '0.3'; bankEl.style.outline = 'none'; }
+  selectedWord = null;
+}
+function removeWord(i) {
+  const w = collocAnswers[i];
+  if (w) {
+    const bankEl = document.getElementById(`bank-${w}`);
+    if (bankEl) { bankEl.classList.remove('used'); bankEl.style.opacity = '1'; }
+  }
+  delete collocAnswers[i];
+  document.getElementById(`drop-${i}`).innerHTML = '';
+}
+function checkCollocations() {
+  let score = 0;
+  collocItems.forEach((item, i) => {
+    const card = document.getElementById(`colloc-${i}`);
+    const ans = collocAnswers[i];
+    if (ans === item.answer) { score++; card.className = 'card correct'; }
+    else { card.className = 'card wrong'; }
+  });
+  document.getElementById('colloc-score').textContent = `Score: ${score} / ${collocItems.length}. ${score < collocItems.length ? 'Wrong answers are marked in red.' : 'Perfect!'}`;
+  window._collocScore = score;
+}
+
+// ---- RENDER CONTEXT ----
+let contextAnswers = {};
+function renderContext() {
+  const c = document.getElementById('context-container');
+  c.innerHTML = contextQuestions.map((q, qi) => `
+    <div class="card neutral" id="ctx-${qi}">
+      <p style="margin-bottom:10px"><span class="num">${qi+1}.</span>Which sentence uses <strong class="word-bold">"${q.word}"</strong> INCORRECTLY?</p>
+      ${q.sentences.map((s, si) => `
+        <div style="margin-bottom:8px">
+          <button class="mc-btn" style="width:100%;text-align:left" id="ctx-btn-${qi}-${si}" onclick="pickContext(${qi},${si},${s.correct})">${String.fromCharCode(65+si)}) ${s.text}</button>
+          <div id="ctx-fb-${qi}-${si}"></div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function pickContext(qi, si, isCorrect) {
+  if (document.getElementById(`ctx-btn-${qi}-0`).disabled) return;
+  const choseWrong = !isCorrect;
+  contextQuestions[qi].sentences.forEach((s, i) => {
+    const btn = document.getElementById(`ctx-btn-${qi}-${i}`);
+    btn.disabled = true;
+    const fb = document.getElementById(`ctx-fb-${qi}-${i}`);
+    if (!s.correct) {
+      btn.classList.add(si === i ? (choseWrong ? 'chosen-correct' : 'chosen-wrong') : 'reveal-correct');
+      if (s.reason) fb.innerHTML = `<div class="feedback ${choseWrong && si===i ? 'ok':'bad'}" style="margin-top:4px">${choseWrong && si===i ? '✓ Correct! ' : '✗ This was the wrong one: '}${s.reason}</div>`;
+    }
+  });
+  if (!contextAnswers[qi]) contextAnswers[qi] = choseWrong;
+  document.getElementById(`ctx-${qi}`).className = 'card ' + (choseWrong ? 'correct' : 'wrong');
+}
+
+// ---- SCORE TAB ----
+function updateScore() {
+  const mc = window._mcScore || 0;
+  const col = window._collocScore || 0;
+  const ctx = Object.values(contextAnswers).filter(Boolean).length;
+  const total = mc + col + ctx;
+  const max = mcQuestions.length + collocItems.length + contextQuestions.length;
+  document.getElementById('total-score').textContent = `${total} / ${max}`;
+  document.getElementById('total-label').textContent = total === max ? '🎉 Perfect score!' : total >= max * 0.75 ? '👍 Great work!' : '💪 Keep practising!';
+  document.getElementById('total-bar').style.width = Math.round(total/max*100) + '%';
+}
+
+// ---- NAV ----
+function showTab(n) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===n));
+  document.querySelectorAll('nav button').forEach((b,i) => b.classList.toggle('active', i===n));
+  if (n===3) updateScore();
+}
+
+function shuffle(a) { return [...a].sort(() => Math.random()-0.5); }
+
+renderMC();
+renderCollocations();
+renderContext();
+</script>
+</body>
+</html>
