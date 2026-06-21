@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vocab Trainer – Gender & Identity</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f5f0e8;
+  --panel: #fff;
+  --navy: #0d1b2a;
+  --accent1: #7b2d8b;
+  --accent2: #1a6b9a;
+  --accent3: #c0392b;
+  --accent4: #1a7a4a;
+  --gold: #c8960a;
+  --text: #1a1a2e;
+  --muted: #666;
+  --border: #ddd;
+  --correct: #1a7a4a;
+  --wrong: #c0392b;
+  --correct-bg: #eafaf1;
+  --wrong-bg: #fdecea;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* NAV */
+.top-nav {
+  background: var(--navy);
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.nav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: #e8c84a;
+}
+
+.nav-score {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e8c84a;
+}
+
+/* SECTION TABS */
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  background: var(--navy);
+  border-bottom: 2px solid #e8c84a;
+  gap: 0;
+}
+
+.tab {
+  flex-shrink: 0;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab.active { color: #fff; border-bottom-color: #e8c84a; }
+
+/* SCREENS */
+.screen { display: none; padding: 1rem; max-width: 680px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* START */
+#start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  gap: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 900;
+  color: var(--navy);
+  line-height: 1.15;
+}
+
+.hero-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+.section-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.section-card {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.section-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+.card-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-text { text-align: left; }
+.card-label { font-weight: 600; font-size: 0.9rem; }
+.card-sub { font-size: 0.78rem; color: var(--muted); }
+
+.start-all-btn {
+  background: var(--navy);
+  color: #e8c84a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 2rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+}
+
+.start-all-btn:hover { background: #1a2f45; }
+
+/* SECTION HEADER */
+.section-header {
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  color: #fff;
+}
+
+.section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.section-header p {
+  font-size: 0.82rem;
+  opacity: 0.85;
+  margin-top: 0.2rem;
+}
+
+/* INPUT CARDS */
+.input-card {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid var(--border);
+}
+
+.input-card .term {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--navy);
+}
+
+.input-card .definition {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.input-card .collocation {
+  margin-top: 0.5rem;
+  font-size: 0.83rem;
+  background: #f0f0f0;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  color: #444;
+  font-style: italic;
+}
+
+/* EXERCISES */
+.exercise-block {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+
+.exercise-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.exercise-q {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: var(--navy);
+  line-height: 1.4;
+}
+
+/* MC options */
+.mc-options { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.mc-btn {
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.mc-btn:hover:not(:disabled) { border-color: var(--accent2); background: #f0f7ff; }
+.mc-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 600; }
+.mc-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+.mc-btn:disabled { cursor: default; }
+
+/* Fill gap */
+.gap-sentences { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 0.9rem; }
+
+.gap-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; font-size: 0.93rem; line-height: 2; }
+
+.gap-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  border: 2px dashed var(--accent2);
+  background: #f0f7ff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.gap-slot.selected {
+  border-style: solid;
+  border-color: var(--gold);
+  background: #fff8e1;
+  box-shadow: 0 0 0 3px rgba(200,150,10,0.25);
+}
+
+.gap-slot.filled {
+  border-style: solid;
+  border-color: var(--accent2);
+  background: #e8f4fd;
+  cursor: pointer;
+}
+
+.gap-slot.correct {
+  border-color: var(--correct);
+  background: var(--correct-bg);
+  color: var(--correct);
+  cursor: default;
+}
+
+.gap-slot.wrong {
+  border-color: var(--wrong);
+  background: var(--wrong-bg);
+  color: var(--wrong);
+  cursor: default;
+}
+
+.gap-slot.empty-placeholder { color: #999; font-weight: 400; font-style: italic; }
+
+.word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.word-chip {
+  padding: 0.3rem 0.8rem;
+  background: #eee;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  border: 1.5px solid #ccc;
+  user-select: none;
+  transition: all 0.15s;
+}
+
+.word-chip:hover { background: #e0e0e0; }
+.word-chip.used { opacity: 0.3; pointer-events: none; text-decoration: line-through; }
+
+/* Matching */
+.match-pairs { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.match-left {
+  background: #f0f4ff;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  flex: 1;
+}
+
+.match-select {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.83rem;
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+
+.match-select.correct { border-color: var(--correct); background: var(--correct-bg); }
+.match-select.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+
+/* Odd one out */
+.odd-options { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+
+.odd-btn {
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text);
+}
+
+.odd-btn:hover:not(:disabled) { border-color: var(--accent1); }
+.odd-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 600; }
+.odd-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+
+/* Check btn */
+.check-btn {
+  margin-top: 0.8rem;
+  padding: 0.55rem 1.2rem;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.check-btn:hover { background: #1a2f45; }
+.check-btn:disabled { background: #999; cursor: default; }
+
+/* Feedback */
+.feedback {
+  display: none;
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.feedback.correct { background: var(--correct-bg); color: var(--correct); display: block; }
+.feedback.wrong { background: var(--wrong-bg); color: var(--wrong); display: block; }
+
+/* Section nav */
+.section-nav {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.nav-btn {
+  padding: 0.6rem 1.3rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.nav-btn.primary { background: var(--navy); color: #e8c84a; }
+.nav-btn.primary:hover { background: #1a2f45; }
+.nav-btn.secondary { background: #eee; color: #333; }
+.nav-btn.secondary:hover { background: #ddd; }
+
+/* FINAL */
+#final-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+#final-screen.active { display: flex; }
+
+.final-score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #e8c84a;
+}
+
+.final-score-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.final-score-label { font-size: 0.75rem; opacity: 0.8; }
+
+.final-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.final-msg { color: var(--muted); max-width: 320px; }
+
+.restart-btn {
+  background: var(--navy);
+  color: #e8c84a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 2rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Section score badge */
+.section-score {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: #e8c84a;
+  color: var(--navy);
+  border-radius: 20px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.2rem 0;
+}
+
+.phase-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phase-label::after { content: ''; flex: 1; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="nav-title">Vocab Trainer · Gender &amp; Identity</div>
+  <div class="nav-score">Score: <span id="total-score">0</span> pts</div>
+</div>
+
+<div class="tabs" id="tabs" style="display:none">
+  <div class="tab active" onclick="jumpTo(0)">Story of an Hour</div>
+  <div class="tab" onclick="jumpTo(1)">Weekend</div>
+  <div class="tab" onclick="jumpTo(2)">Liberation</div>
+  <div class="tab" onclick="jumpTo(3)">First Feminists</div>
+</div>
+
+<!-- START -->
+<div id="start-screen">
+  <div>
+    <div class="hero-title">Vocabulary<br>Trainer</div>
+    <p class="hero-sub" style="margin-top:0.5rem">Gender &amp; Identity · English 12 · 4 units</p>
+  </div>
+  <div class="section-cards">
+    <div class="section-card" onclick="startSection(0)">
+      <div class="card-dot" style="background:#c0392b"></div>
+      <div class="card-text">
+        <div class="card-label">The Story of an Hour</div>
+        <div class="card-sub">Kate Chopin · freedom, conformity, patriarchy</div>
+      </div>
+    </div>
+    <div class="section-card" onclick="startSection(1)">
+      <div class="card-dot" style="background:#1a6b9a"></div>
+      <div class="card-text">
+        <div class="card-label">Weekend</div>
+        <div class="card-sub">Fay Weldon · mental load, domestic roles, resilience</div>
+      </div>
+    </div>
+    <div class="section-card" onclick="startSection(2)">
+      <div class="card-dot" style="background:#1a7a4a"></div>
+      <div class="card-text">
+        <div class="card-label">Liberation &amp; Empowerment</div>
+        <div class="card-sub">collocations · freedom, constraints, selfhood</div>
+      </div>
+    </div>
+    <div class="section-card" onclick="startSection(3)">
+      <div class="card-dot" style="background:#7b2d8b"></div>
+      <div class="card-text">
+        <div class="card-label">The First Feminists</div>
+        <div class="card-sub">Bernardine Evaristo · egalitarianism, resilience, power</div>
+      </div>
+    </div>
+  </div>
+  <button class="start-all-btn" onclick="startSection(0)">Start with Unit 1 →</button>
+</div>
+
+<!-- SECTION SCREENS -->
+<div id="section-0" class="screen"></div>
+<div id="section-1" class="screen"></div>
+<div id="section-2" class="screen"></div>
+<div id="section-3" class="screen"></div>
+
+<!-- FINAL -->
+<div id="final-screen">
+  <div class="final-score-circle">
+    <div class="final-score-num" id="final-num">0</div>
+    <div class="final-score-label">points</div>
+  </div>
+  <div class="final-title">Well done!</div>
+  <p class="final-msg" id="final-msg"></p>
+  <button class="restart-btn" onclick="location.reload()">Start again</button>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const SECTIONS = [
+  {
+    id: 0,
+    title: "The Story of an Hour",
+    author: "Kate Chopin",
+    color: "#c0392b",
+    vocab: [
+      { term: "newfound freedom", def: "recently acquired liberty or independence", collocation: "She experienced a sense of newfound freedom after years of conformity." },
+      { term: "desire for autonomy", def: "a strong wish for independence and self-governance", collocation: "Her desire for autonomy had been suppressed by social expectations." },
+      { term: "conformity", def: "adherence to established customs, behaviours or social norms", collocation: "Society demanded conformity, especially from women." },
+      { term: "patriarchal society", def: "a social structure where men hold primary positions of power and authority", collocation: "In a patriarchal society, women's voices were often silenced." },
+      { term: "male privilege", def: "unearned advantages men experience in society solely based on their gender", collocation: "Male privilege allowed her husband to make decisions without consulting her." },
+      { term: "biased beliefs", def: "prejudiced or unfairly influenced convictions that favour one perspective", collocation: "Biased beliefs about gender roles shaped every aspect of her daily life." },
+      { term: "brief moment of illumination", def: "a short-lived period of understanding or enlightenment", collocation: "In that brief moment of illumination, she understood what freedom really meant." },
+      { term: "to be constrained by traditional gender roles", def: "to face limitations imposed by social norms regarding how individuals of a specific gender should behave", collocation: "She had always been constrained by traditional gender roles." },
+    ],
+    exercises: [
+      {
+        type: "mc",
+        q: "What does 'conformity' mean?",
+        options: [
+          "a strong wish for independence",
+          "adherence to established customs and social norms",
+          "recently acquired liberty",
+          "prejudiced convictions about others"
+        ],
+        answer: 1,
+        points: 10
+      },
+      {
+        type: "mc",
+        q: "Which phrase best describes 'patriarchal society'?",
+        options: [
+          "a society where women hold primary positions of power",
+          "a society based on egalitarian values",
+          "a social structure where men hold primary positions of power and authority",
+          "a community defined by shared responsibility"
+        ],
+        answer: 2,
+        points: 10
+      },
+      {
+        type: "gap",
+        q: "Fill in the gaps with the correct words:",
+        sentences: [
+          { text: "Her __ for __ had been hidden for years.", answers: ["desire", "autonomy"], hint: "desire / autonomy" },
+          { text: "Society's __ beliefs kept women in __ roles.", answers: ["biased", "subordinate"], hint: "biased / subordinate" },
+        ],
+        bank: ["desire", "autonomy", "biased", "subordinate", "conformity", "privilege"],
+        points: 20
+      },
+      {
+        type: "odd",
+        q: "Odd one out – which word does NOT relate to freedom and independence?",
+        options: ["autonomy", "newfound freedom", "conformity", "liberation"],
+        answer: 2,
+        explanation: "'Conformity' means following norms – the opposite of freedom.",
+        points: 10
+      },
+      {
+        type: "mc",
+        q: "In context: Mrs. Mallard experiences a 'brief moment of illumination'. What does this mean?",
+        options: [
+          "She turns on a light in the dark room.",
+          "She has a short-lived but powerful moment of understanding and clarity.",
+          "She feels confused and overwhelmed.",
+          "She remembers a happy moment from her past."
+        ],
+        answer: 1,
+        points: 10
+      }
+    ]
+  },
+  {
+    id: 1,
+    title: "Weekend",
+    author: "Fay Weldon",
+    color: "#1a6b9a",
+    vocab: [
+      { term: "mental load", def: "mental burden or strain associated with managing various tasks, responsibilities and concerns", collocation: "Martha carries the entire mental load of the family without recognition." },
+      { term: "domestic responsibility", def: "duties and tasks related to managing household affairs", collocation: "Domestic responsibility fell entirely on her shoulders during the weekend." },
+      { term: "subordinate role", def: "position of lesser importance or authority within a hierarchical structure", collocation: "She was expected to accept a subordinate role without question." },
+      { term: "feelings of inadequacy", def: "emotions related to a perceived lack of competence or worth", collocation: "Despite working tirelessly, she was plagued by feelings of inadequacy." },
+      { term: "assertive", def: "characterised by bold or confident statements and behaviour", collocation: "She wished she could be more assertive when her efforts went unnoticed." },
+      { term: "resilient", def: "ability to recover quickly from difficulties or setbacks", collocation: "Martha proved remarkably resilient, continuing despite exhaustion and resentment." },
+      { term: "nonchalant attitude", def: "unconcerned or indifferent demeanour", collocation: "Her husband's nonchalant attitude towards her work infuriated her." },
+      { term: "to grapple with sth", def: "to struggle with or to deal with a difficult problem or situation", collocation: "She had to grapple with impossible expectations every single weekend." },
+      { term: "obligation", def: "moral or legal duty; something one is bound to do", collocation: "She felt a sense of obligation that left no room for her own desires." },
+    ],
+    exercises: [
+      {
+        type: "mc",
+        q: "What is the 'mental load'?",
+        options: [
+          "physical exhaustion from housework",
+          "the mental burden of managing tasks and responsibilities",
+          "a feeling of inadequacy",
+          "a nonchalant attitude towards problems"
+        ],
+        answer: 1,
+        points: 10
+      },
+      {
+        type: "gap",
+        q: "Fill in the gaps:",
+        sentences: [
+          { text: "Martha had to __ with the __ of managing everything alone.", answers: ["grapple", "burden"], hint: "grapple / burden" },
+          { text: "Her husband's __ attitude made her feel her work was invisible.", answers: ["nonchalant"], hint: "nonchalant" },
+        ],
+        bank: ["grapple", "burden", "nonchalant", "assertive", "obligation", "resilient"],
+        points: 20
+      },
+      {
+        type: "match",
+        q: "Match each term to its definition:",
+        pairs: [
+          { left: "subordinate role", right: "position of lesser importance in a hierarchy" },
+          { left: "feelings of inadequacy", right: "emotions related to a perceived lack of worth" },
+          { left: "obligation", right: "moral duty; something one is bound to do" },
+          { left: "resilient", right: "able to recover quickly from difficulties" },
+        ],
+        points: 20
+      },
+      {
+        type: "odd",
+        q: "Odd one out – which word does NOT describe a negative emotional burden?",
+        options: ["mental load", "feelings of inadequacy", "assertive", "obligation"],
+        answer: 2,
+        explanation: "'Assertive' describes confident behaviour – it is positive, not a burden.",
+        points: 10
+      },
+      {
+        type: "mc",
+        q: "In context: Martha's husband has a 'nonchalant attitude'. What does this suggest about him?",
+        options: [
+          "He is anxious and worried about her wellbeing.",
+          "He is unconcerned and indifferent to Martha's efforts.",
+          "He is assertive and takes charge of responsibilities.",
+          "He is resilient and handles pressure well."
+        ],
+        answer: 1,
+        points: 10
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Liberation & Empowerment",
+    author: "collocations",
+    color: "#1a7a4a",
+    vocab: [
+      { term: "social illumination", def: "awareness or enlightenment within a community", collocation: "The feminist movement brought social illumination to millions of women." },
+      { term: "institution of marriage", def: "marriage as a formal social structure", collocation: "She began to question the institution of marriage and its expectations." },
+      { term: "to be confined by selfhood", def: "to be restricted by one's own sense of identity", collocation: "Women were often confined by a selfhood that society had constructed for them." },
+      { term: "inner independence", def: "a personal, internal sense of freedom", collocation: "She cultivated inner independence even when outer freedom was denied." },
+      { term: "moment of shift", def: "a turning point or change", collocation: "The protest was a moment of shift in the history of women's rights." },
+      { term: "emotional and physical reaction", def: "a response involving both feelings and the body", collocation: "Her emotional and physical reaction to the news was overwhelming." },
+      { term: "yearning for liberation", def: "a deep longing for freedom", collocation: "The character's yearning for liberation drives the entire narrative." },
+      { term: "personal constraints", def: "individual limitations or restrictions", collocation: "She broke through personal constraints to claim her own voice." },
+      { term: "right to liberation", def: "the entitlement to freedom", collocation: "These women fought for the right to liberation long before it was recognised." },
+      { term: "emotional turmoil", def: "a state of great disturbance or confusion of feelings", collocation: "Living under oppression caused constant emotional turmoil." },
+    ],
+    exercises: [
+      {
+        type: "match",
+        q: "Match the first part of each collocation to its second part:",
+        pairs: [
+          { left: "social", right: "illumination" },
+          { left: "institution of", right: "marriage" },
+          { left: "yearning for", right: "liberation" },
+          { left: "emotional", right: "turmoil" },
+          { left: "right to", right: "liberation" },
+        ],
+        points: 25
+      },
+      {
+        type: "mc",
+        q: "What does 'moment of shift' mean?",
+        options: [
+          "a period of emotional turmoil",
+          "a turning point or significant change",
+          "an inner sense of independence",
+          "a physical reaction to oppression"
+        ],
+        answer: 1,
+        points: 10
+      },
+      {
+        type: "gap",
+        q: "Fill in the gaps with the correct collocations:",
+        sentences: [
+          { text: "Her deep __ for __ made her question everything.", answers: ["yearning", "liberation"], hint: "yearning / liberation" },
+          { text: "She cultivated __ independence even when outer freedom was denied.", answers: ["inner"], hint: "inner" },
+        ],
+        bank: ["yearning", "liberation", "inner", "personal", "emotional", "social"],
+        points: 15
+      },
+      {
+        type: "odd",
+        q: "Odd one out – which does NOT suggest restriction or limitation?",
+        options: ["personal constraints", "to be confined by", "inner independence", "social expectations/norms/pressures"],
+        answer: 2,
+        explanation: "'Inner independence' describes freedom, not restriction.",
+        points: 10
+      },
+      {
+        type: "mc",
+        q: "In context: A character experiences 'emotional turmoil'. What best describes this?",
+        options: [
+          "She feels calm and at peace with her situation.",
+          "She experiences great inner disturbance and confusion of feelings.",
+          "She has a nonchalant attitude towards her problems.",
+          "She finds a moment of shift and liberation."
+        ],
+        answer: 1,
+        points: 10
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "The First Feminists",
+    author: "Bernardine Evaristo",
+    color: "#7b2d8b",
+    vocab: [
+      { term: "egalitarianism", def: "a belief in human equality, especially in political, social, and economic life", collocation: "Egalitarianism was at the heart of early feminist movements." },
+      { term: "alpha females", def: "dominant or assertive women who take a leadership role", collocation: "The text celebrates alpha females who challenged social hierarchies." },
+      { term: "to challenge social constructs", def: "to question or oppose established social norms", collocation: "These women dared to challenge social constructs centuries before feminism had a name." },
+      { term: "fluid power dynamics", def: "the changing nature of power relations", collocation: "Fluid power dynamics meant that women's influence shifted across different cultures." },
+      { term: "matriarchal", def: "relating to a social system where women hold power positions", collocation: "Some early societies were matriarchal, with women leading communities." },
+      { term: "to be resilient", def: "to recover quickly from difficulties", collocation: "Throughout history, women proved resilient in the face of oppression." },
+      { term: "shared responsibility", def: "a duty or task carried out by more than one person", collocation: "Evaristo argues that shared responsibility between genders is essential." },
+      { term: "sense of equality", def: "awareness or belief in the equal value of others", collocation: "A sense of equality drove these women to resist domination." },
+      { term: "to resist domination", def: "to oppose control or authority", collocation: "From the earliest times, women found ways to resist domination." },
+    ],
+    exercises: [
+      {
+        type: "mc",
+        q: "What does 'egalitarianism' mean?",
+        options: [
+          "belief that women are superior to men",
+          "a matriarchal social system",
+          "a belief in human equality in political, social and economic life",
+          "the practice of challenging social constructs"
+        ],
+        answer: 2,
+        points: 10
+      },
+      {
+        type: "mc",
+        q: "What are 'fluid power dynamics'?",
+        options: [
+          "fixed hierarchies that never change",
+          "the changing nature of power relations",
+          "the dominance of alpha females in society",
+          "shared responsibility between genders"
+        ],
+        answer: 1,
+        points: 10
+      },
+      {
+        type: "gap",
+        q: "Fill in the gaps:",
+        sentences: [
+          { text: "These women chose to __ social __ long before the word 'feminism' existed.", answers: ["challenge", "constructs"], hint: "challenge / constructs" },
+          { text: "A __ of __ drove them to oppose all forms of domination.", answers: ["sense", "equality"], hint: "sense / equality" },
+        ],
+        bank: ["challenge", "constructs", "sense", "equality", "resist", "matriarchal", "shared"],
+        points: 20
+      },
+      {
+        type: "match",
+        q: "Match each term to its definition:",
+        pairs: [
+          { left: "matriarchal", right: "social system where women hold power" },
+          { left: "alpha females", right: "dominant women who take a leadership role" },
+          { left: "shared responsibility", right: "a duty carried out by more than one person" },
+          { left: "to resist domination", right: "to oppose control or authority" },
+        ],
+        points: 20
+      },
+      {
+        type: "odd",
+        q: "Odd one out – which term does NOT relate to power or leadership?",
+        options: ["alpha females", "matriarchal", "egalitarianism", "fluid power dynamics"],
+        answer: 2,
+        explanation: "'Egalitarianism' is about equality for all, not specifically about power or leadership structures.",
+        points: 10
+      }
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let totalScore = 0;
+let currentSection = -1;
+let exerciseAnswered = {}; // key: "s-e" -> answered
+
+function updateScore(pts) {
+  totalScore += pts;
+  document.getElementById('total-score').textContent = totalScore;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function showStartScreen() {
+  document.getElementById('start-screen').style.display = 'flex';
+  document.getElementById('tabs').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('final-screen').classList.remove('active');
+}
+
+function startSection(idx) {
+  currentSection = idx;
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('tabs').style.display = 'flex';
+  document.getElementById('final-screen').classList.remove('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById(`section-${idx}`);
+  sec.classList.add('active');
+  // update tabs
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  // render if empty
+  if (!sec.innerHTML.trim()) renderSection(idx, sec);
+  sec.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function jumpTo(idx) { startSection(idx); }
+
+function nextSection() {
+  if (currentSection < SECTIONS.length - 1) {
+    startSection(currentSection + 1);
+  } else {
+    showFinal();
+  }
+}
+
+function showFinal() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('tabs').style.display = 'none';
+  const f = document.getElementById('final-screen');
+  f.classList.add('active');
+  document.getElementById('final-num').textContent = totalScore;
+  const msgs = [
+    [0, 50, "Keep going – every word you learn counts! 💪"],
+    [51, 100, "Good effort! Review the units and try again."],
+    [101, 150, "Well done! You've got a solid grasp of the vocabulary."],
+    [151, 999, "Excellent! You're ready for the Abi. 🌟"]
+  ];
+  const msg = msgs.find(([min,max]) => totalScore >= min && totalScore <= max);
+  document.getElementById('final-msg').textContent = msg ? msg[2] : '';
+}
+
+// ── RENDER SECTION ────────────────────────────────────────────────────────────
+function renderSection(idx, container) {
+  const s = SECTIONS[idx];
+  let html = '';
+
+  // Header
+  html += `<div class="section-header" style="background:${s.color}">
+    <h2>${s.title}</h2>
+    <p>${s.author}</p>
+  </div>`;
+
+  // Vocab input
+  html += `<div class="phase-label">Vocabulary Input</div>`;
+  s.vocab.forEach(v => {
+    html += `<div class="input-card">
+      <div class="term">${v.term}</div>
+      <div class="definition">${v.def}</div>
+      <div class="collocation">"${v.collocation}"</div>
+    </div>`;
+  });
+
+  html += `<hr class="divider"><div class="phase-label">Exercises</div>`;
+
+  // Exercises
+  s.exercises.forEach((ex, ei) => {
+    html += renderExercise(idx, ei, ex);
+  });
+
+  // Nav
+  const isLast = idx === SECTIONS.length - 1;
+  html += `<div class="section-nav">
+    ${idx > 0 ? `<button class="nav-btn secondary" onclick="startSection(${idx-1})">← Previous</button>` : ''}
+    <button class="nav-btn primary" onclick="${isLast ? 'showFinal()' : `startSection(${idx+1})`}">${isLast ? 'See my score →' : 'Next unit →'}</button>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function renderExercise(si, ei, ex) {
+  const key = `${si}-${ei}`;
+  let html = `<div class="exercise-block" id="ex-${key}">
+    <div class="exercise-label">${ex.type === 'mc' ? 'Multiple Choice' : ex.type === 'gap' ? 'Fill in the Gap' : ex.type === 'match' ? 'Matching' : 'Odd One Out'} · ${ex.points} pts</div>
+    <div class="exercise-q">${ex.q}</div>`;
+
+  if (ex.type === 'mc') {
+    html += `<div class="mc-options">`;
+    ex.options.forEach((opt, oi) => {
+      html += `<button class="mc-btn" id="mc-${key}-${oi}" onclick="checkMC('${key}', ${oi}, ${ex.answer}, ${ex.points})">${opt}</button>`;
+    });
+    html += `</div>`;
+  }
+
+  if (ex.type === 'gap') {
+    // word bank
+    html += `<div class="word-bank" id="bank-${key}">`;
+    ex.bank.forEach((w,wi) => {
+      html += `<span class="word-chip" id="chip-${key}-${wi}" onclick="selectWord('${key}', '${w}', ${wi})">${w}</span>`;
+    });
+    html += `</div>`;
+    // sentences with tap-able slots
+    html += `<div class="gap-sentences">`;
+    ex.sentences.forEach((sent, si2) => {
+      const parts = sent.text.split(/(__+)/);
+      // count blanks
+      let gapIdx = 0;
+      html += `<div class="gap-wrap">`;
+      parts.forEach(part => {
+        if (/^__+$/.test(part)) {
+          html += `<span class="gap-slot empty-placeholder" id="slot-${key}-${si2}-${gapIdx}" onclick="selectSlot('${key}', ${si2}, ${gapIdx})">tap to fill</span>`;
+          gapIdx++;
+        } else if (part.trim()) {
+          html += `<span>${part}</span>`;
+        }
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+    html += `<div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;">① Tap a gap to select it &nbsp;② Tap a word to place it &nbsp;③ Tap a filled gap to remove</div>`;
+    html += `<button class="check-btn" id="btn-${key}" onclick="checkGap('${key}', ${si}, ${ei})">Check</button>`;
+  }
+
+  if (ex.type === 'match') {
+    const shuffled = [...ex.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+    html += `<div class="match-pairs">`;
+    ex.pairs.forEach((pair, pi) => {
+      html += `<div class="match-row">
+        <div class="match-left">${pair.left}</div>
+        <select class="match-select" id="match-${key}-${pi}">
+          <option value="">– select –</option>
+          ${shuffled.map(r => `<option value="${r}">${r}</option>`).join('')}
+        </select>
+      </div>`;
+    });
+    html += `</div>
+    <button class="check-btn" id="btn-${key}" onclick="checkMatch('${key}', ${si}, ${ei})">Check</button>`;
+  }
+
+  if (ex.type === 'odd') {
+    html += `<div class="odd-options">`;
+    ex.options.forEach((opt, oi) => {
+      html += `<button class="odd-btn" id="odd-${key}-${oi}" onclick="checkOdd('${key}', ${oi}, ${ex.answer}, ${ex.points}, \`${ex.explanation}\`)">${opt}</button>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div class="feedback" id="fb-${key}"></div></div>`;
+  return html;
+}
+
+// ── CHECK FUNCTIONS ───────────────────────────────────────────────────────────
+function checkMC(key, chosen, answer, pts) {
+  if (exerciseAnswered[key]) return;
+  exerciseAnswered[key] = true;
+  const btns = document.querySelectorAll(`[id^="mc-${key}-"]`);
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === answer) b.classList.add('correct');
+    else if (i === chosen) b.classList.add('wrong');
+  });
+  const fb = document.getElementById(`fb-${key}`);
+  if (chosen === answer) {
+    fb.className = 'feedback correct';
+    fb.textContent = `✓ Correct! +${pts} points`;
+    updateScore(pts);
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ Not quite. The correct answer is: "${btns[answer].textContent}"`;
+  }
+}
+
+// Gap state: { key: { selectedSlot: [si2,gi]|null, slots: {si2-gi: {word, chipIdx}} } }
+const gapState = {};
+
+function getGapState(key) {
+  if (!gapState[key]) gapState[key] = { selectedSlot: null, slots: {} };
+  return gapState[key];
+}
+
+function selectSlot(key, si2, gi) {
+  if (exerciseAnswered[key]) return;
+  const state = getGapState(key);
+  const slotId = `${si2}-${gi}`;
+  const slot = document.getElementById(`slot-${key}-${si2}-${gi}`);
+
+  // If slot is filled → remove word, return to bank
+  if (state.slots[slotId]) {
+    const { word, chipIdx } = state.slots[slotId];
+    delete state.slots[slotId];
+    slot.textContent = 'tap to fill';
+    slot.classList.remove('filled', 'selected');
+    slot.classList.add('empty-placeholder');
+    const chip = document.getElementById(`chip-${key}-${chipIdx}`);
+    if (chip) chip.classList.remove('used');
+    state.selectedSlot = null;
+    return;
+  }
+
+  // Deselect all slots for this key
+  document.querySelectorAll(`[id^="slot-${key}-"]`).forEach(s => s.classList.remove('selected'));
+
+  // Select this slot
+  state.selectedSlot = [si2, gi];
+  slot.classList.add('selected');
+}
+
+function selectWord(key, word, chipIdx) {
+  if (exerciseAnswered[key]) return;
+  const state = getGapState(key);
+  if (!state.selectedSlot) return; // no slot selected
+
+  const [si2, gi] = state.selectedSlot;
+  const slotId = `${si2}-${gi}`;
+  const slot = document.getElementById(`slot-${key}-${si2}-${gi}`);
+
+  // Place word
+  state.slots[slotId] = { word, chipIdx };
+  slot.textContent = word;
+  slot.classList.remove('selected', 'empty-placeholder');
+  slot.classList.add('filled');
+
+  // Mark chip used
+  const chip = document.getElementById(`chip-${key}-${chipIdx}`);
+  if (chip) chip.classList.add('used');
+
+  state.selectedSlot = null;
+}
+
+function checkGap(key, si, ei) {
+  if (exerciseAnswered[key]) return;
+  const ex = SECTIONS[si].exercises[ei];
+  const state = getGapState(key);
+  let correct = 0; let total = 0;
+
+  ex.sentences.forEach((sent, si2) => {
+    const numGaps = sent.answers.length;
+    for (let gi = 0; gi < numGaps; gi++) {
+      total++;
+      const slotId = `${si2}-${gi}`;
+      const slot = document.getElementById(`slot-${key}-${si2}-${gi}`);
+      const placed = state.slots[slotId] ? state.slots[slotId].word.toLowerCase() : '';
+      const expected = sent.answers[gi].toLowerCase();
+      if (placed === expected) {
+        slot.classList.remove('filled', 'empty-placeholder');
+        slot.classList.add('correct');
+        correct++;
+      } else {
+        slot.classList.remove('filled', 'empty-placeholder');
+        slot.classList.add('wrong');
+        slot.textContent = placed || '–';
+      }
+    }
+  });
+
+  exerciseAnswered[key] = true;
+  document.getElementById(`btn-${key}`).disabled = true;
+  const fb = document.getElementById(`fb-${key}`);
+  const earned = Math.round((correct / total) * ex.points);
+  if (correct === total) {
+    fb.className = 'feedback correct';
+    fb.textContent = `✓ Perfect! +${ex.points} points`;
+    updateScore(ex.points);
+  } else {
+    const answerText = ex.sentences.map(s => s.hint).join(' | ');
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ ${correct}/${total} correct. Answers: ${answerText}${earned > 0 ? `. +${earned} points` : ''}`;
+    if (earned > 0) updateScore(earned);
+  }
+}
+
+function checkMatch(key, si, ei) {
+  if (exerciseAnswered[key]) return;
+  const ex = SECTIONS[si].exercises[ei];
+  let correct = 0;
+  ex.pairs.forEach((pair, pi) => {
+    const sel = document.getElementById(`match-${key}-${pi}`);
+    sel.disabled = true;
+    if (sel.value === pair.right) {
+      sel.classList.add('correct');
+      correct++;
+    } else {
+      sel.classList.add('wrong');
+    }
+  });
+  exerciseAnswered[key] = true;
+  document.getElementById(`btn-${key}`).disabled = true;
+  const fb = document.getElementById(`fb-${key}`);
+  const earned = Math.round((correct / ex.pairs.length) * ex.points);
+  if (correct === ex.pairs.length) {
+    fb.className = 'feedback correct';
+    fb.textContent = `✓ All correct! +${ex.points} points`;
+    updateScore(ex.points);
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ ${correct}/${ex.pairs.length} correct. +${earned} points`;
+    if (earned > 0) updateScore(earned);
+  }
+}
+
+function checkOdd(key, chosen, answer, pts, explanation) {
+  if (exerciseAnswered[key]) return;
+  exerciseAnswered[key] = true;
+  const btns = document.querySelectorAll(`[id^="odd-${key}-"]`);
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === answer) b.classList.add('correct');
+    else if (i === chosen) b.classList.add('wrong');
+  });
+  const fb = document.getElementById(`fb-${key}`);
+  if (chosen === answer) {
+    fb.className = 'feedback correct';
+    fb.textContent = `✓ Correct! ${explanation} +${pts} points`;
+    updateScore(pts);
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `✗ Not quite. ${explanation}`;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English 12 – Review Gameshow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --navy: #0d1b2a;
+    --gold: #e8c84a;
+    --gold-dark: #b89a2a;
+    --cream: #f5f0e8;
+    --red: #c0392b;
+    --green: #27ae60;
+    --panel: #162336;
+    --panel2: #1e2f45;
+    --text-light: #d4cfc5;
+    --cat1: #1a6b9a;
+    --cat2: #7b2d8b;
+    --cat3: #c0392b;
+    --cat4: #1a7a4a;
+    --cat5: #b07020;
+    --cat6: #2a6b6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── SETUP SCREEN ── */
+  #setup {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .logo span { color: var(--cream); }
+
+  .setup-box {
+    background: var(--panel);
+    border: 1px solid #2a3f5a;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .setup-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+  }
+
+  .team-inputs { display: flex; flex-direction: column; gap: 0.7rem; }
+
+  .team-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .team-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .team-row input {
+    flex: 1;
+    background: var(--navy);
+    border: 1px solid #2a3f5a;
+    border-radius: 6px;
+    color: var(--cream);
+    padding: 0.5rem 0.8rem;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .team-row input:focus { border-color: var(--gold); }
+
+  .team-count-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .count-btn {
+    flex: 1;
+    padding: 0.4rem;
+    background: var(--navy);
+    border: 1px solid #2a3f5a;
+    border-radius: 6px;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+
+  .count-btn.active, .count-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+    border-color: var(--gold);
+    font-weight: 600;
+  }
+
+  .start-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s;
+  }
+
+  .start-btn:hover { background: var(--gold-dark); }
+
+  /* ── GAME SCREEN ── */
+  #game {
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .game-header {
+    background: var(--panel);
+    border-bottom: 2px solid var(--gold);
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .game-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .scoreboard {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .score-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--navy);
+    border: 1px solid #2a3f5a;
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    min-width: 70px;
+  }
+
+  .score-chip .team-name {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+  }
+
+  .score-chip .team-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* BOARD */
+  .board-wrap {
+    padding: 0.8rem;
+    overflow-x: auto;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    min-width: 600px;
+  }
+
+  .cat-header {
+    padding: 0.6rem 0.3rem;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 6px;
+    line-height: 1.3;
+  }
+
+  .cell {
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    color: var(--gold);
+    transition: transform 0.1s, opacity 0.2s;
+    border: 1px solid rgba(255,255,255,0.06);
+    user-select: none;
+  }
+
+  .cell:hover:not(.used) { transform: scale(1.04); }
+  .cell.used { opacity: 0.18; cursor: default; pointer-events: none; }
+
+  /* Category colors */
+  .col-0 .cat-header, .col-0 .cell { background: var(--cat1); }
+  .col-1 .cat-header, .col-1 .cell { background: var(--cat2); }
+  .col-2 .cat-header, .col-2 .cell { background: var(--cat3); }
+  .col-3 .cat-header, .col-3 .cell { background: var(--cat4); }
+  .col-4 .cat-header, .col-4 .cell { background: var(--cat5); }
+  .col-5 .cat-header, .col-5 .cell { background: var(--cat6); }
+
+  /* ── QUESTION MODAL ── */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,12,22,0.92);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: var(--panel);
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 640px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .modal-cat-badge {
+    padding: 0.25rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #fff;
+  }
+
+  .modal-points {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-left: auto;
+  }
+
+  .modal-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    line-height: 1.45;
+    color: var(--cream);
+    font-weight: 700;
+  }
+
+  .modal-answer {
+    display: none;
+    background: var(--navy);
+    border-left: 3px solid var(--gold);
+    padding: 1rem 1.2rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-light);
+  }
+
+  .modal-answer.visible { display: block; }
+
+  .modal-answer strong { color: var(--gold); }
+
+  .show-answer-btn {
+    padding: 0.7rem 1.4rem;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    border-radius: 8px;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    align-self: flex-start;
+  }
+
+  .show-answer-btn:hover { background: var(--gold); color: var(--navy); }
+
+  .points-section {
+    display: none;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .points-section.visible { display: flex; }
+
+  .points-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .points-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .point-btn {
+    padding: 0.45rem 0.9rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    color: #fff;
+  }
+
+  .point-btn:hover { opacity: 0.85; }
+
+  .modal-close {
+    align-self: flex-end;
+    padding: 0.5rem 1.2rem;
+    background: #2a3f5a;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover { background: #3a5070; }
+
+  /* ── FINAL SCREEN ── */
+  #final {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .final-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .podium-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .podium-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    color: var(--cream);
+  }
+
+  .podium-score-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .podium-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    min-height: 20px;
+  }
+
+  .podium-rank {
+    font-size: 1.5rem;
+  }
+
+  .play-again-btn {
+    padding: 0.8rem 2rem;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .play-again-btn:hover { background: var(--gold-dark); }
+
+  /* column wrapper for board layout */
+  .board-col { display: contents; }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="screen active">
+  <div class="logo">English 12<br><span>Review Gameshow</span></div>
+  <div class="setup-box">
+    <h2>How many teams?</h2>
+    <div class="team-count-btns">
+      <button class="count-btn" onclick="setTeamCount(2)">2</button>
+      <button class="count-btn active" onclick="setTeamCount(4)">4</button>
+      <button class="count-btn" onclick="setTeamCount(5)">5</button>
+    </div>
+    <h2>Team names</h2>
+    <div class="team-inputs" id="teamInputs"></div>
+    <button class="start-btn" onclick="startGame()">Start Game</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <div class="game-title">English 12</div>
+    <div class="scoreboard" id="scoreboard"></div>
+  </div>
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="final" class="screen">
+  <div class="final-title">🏆 Game Over</div>
+  <div class="podium" id="podium"></div>
+  <button class="play-again-btn" onclick="location.reload()">Play Again</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-meta">
+      <span class="modal-cat-badge" id="modalBadge"></span>
+      <span class="modal-points" id="modalPoints"></span>
+    </div>
+    <div class="modal-question" id="modalQuestion"></div>
+    <button class="show-answer-btn" id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
+    <div class="modal-answer" id="modalAnswer"></div>
+    <div class="points-section" id="pointsSection">
+      <div class="points-label">Award points to:</div>
+      <div class="points-btns" id="pointsBtns"></div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+const TEAM_COLORS = ['#1a6b9a','#7b2d8b','#c0392b','#1a7a4a','#b07020'];
+const CAT_COLORS  = ['#1a6b9a','#7b2d8b','#c0392b','#1a7a4a','#b07020','#2a6b6b'];
+const POINTS = [100,200,300,400,500];
+
+const DATA = [
+  {
+    cat: "Behold the Dreamers",
+    questions: [
+      { q: "What job does Jende Jonga get at the beginning of the novel?",
+        a: "He becomes a <strong>chauffeur/driver for the Edwards family</strong> on Wall Street." },
+      { q: "Why does the Jonga family ultimately have to leave the US?",
+        a: "Jende's <strong>asylum case fails</strong>, deportation becomes inevitable – he eventually decides to return to Cameroon voluntarily." },
+      { q: "What does Neni's decision at the end of the novel reveal about her character?",
+        a: "She <strong>chooses family and return to Cameroon</strong> over her American Dream – showing pragmatism and strength, but also the limits the system imposed on her choices." },
+      { q: "What role does Clark Edwards play – and what does he represent thematically?",
+        a: "He represents <strong>privileged America</strong> that profits from the system – his own collapse shows that even 'successful' Americans are dependent on and vulnerable to the same system." },
+      { q: '"Neni is a stronger character than Jende." Do you agree? Give two arguments.',
+        a: "<em>Open question – award points for two argued points.</em><br>Pro: She acts decisively, blackmails Cindy Edwards, makes the final key choice.<br>Contra: Jende keeps the family afloat through hard work, fights deportation for a long time." },
+    ]
+  },
+  {
+    cat: "The American Dream",
+    questions: [
+      { q: "Name two classic elements of the American Dream.",
+        a: "Any two of: <strong>freedom, equal opportunity, success through hard work, homeownership, upward mobility.</strong>" },
+      { q: '"The American Dream is alive and well." – Name ONE piece of evidence for and ONE against.',
+        a: "<em>Open – award points for one argued point on each side.</em>" },
+      { q: "How does Behold the Dreamers challenge the traditional idea of the American Dream?",
+        a: "The Jongas work hard and have ambition but are still forced to leave – the novel shows the Dream is only accessible to those with <strong>legal status and the right background</strong>." },
+      { q: 'What is the "rags to riches" idea – and does any character in BHTD achieve it?',
+        a: "The idea that anyone can rise from poverty to success through hard work. <strong>Nobody in BHTD truly achieves it</strong> – the novel deliberately deconstructs this myth." },
+      { q: "How has the American Dream changed from the 1950s to today?",
+        a: "<em>Open – award for two concrete aspects.</em><br>1950s: homeownership, nuclear family, post-war optimism.<br>Today: more skepticism, growing inequality, dream seen as less achievable especially for minorities and immigrants." },
+    ]
+  },
+  {
+    cat: "Immigration & Financial Crisis",
+    questions: [
+      { q: "What is a 'green card' and why does it matter in the novel?",
+        a: "<strong>Permanent US residence permit.</strong> Without it the Jongas have no legal security – their entire situation depends on Jende's precarious visa status." },
+      { q: "How did the financial crisis of 2008 affect the Edwards family – and indirectly the Jongas?",
+        a: "Clark loses his position at <strong>Lehman Brothers</strong> → family falls apart → Jongas lose their income source and protection → deportation becomes unavoidable." },
+      { q: '"Everyone wants to come to America." – What pull and push factors does the novel show?',
+        a: "<strong>Pull:</strong> economic opportunity, freedom, better life for children.<br><strong>Push:</strong> poverty and limited prospects in Cameroon.<br>The novel also questions whether the pull factors are real for everyone." },
+      { q: "What is the difference between a refugee and an economic migrant – and which is Jende?",
+        a: "<strong>Refugee</strong> = flees persecution or war. <strong>Economic migrant</strong> = seeks better opportunities. Jende is primarily an economic migrant, but the novel deliberately blurs this line." },
+      { q: "What does TARP stand for – and what was its role in the 2008 crisis?",
+        a: "<strong>Troubled Asset Relief Program</strong> – $700 billion US government bailout to stabilize banks and prevent total financial collapse after Lehman Brothers fell." },
+    ]
+  },
+  {
+    cat: "Gender & Identity",
+    questions: [
+      { q: "In Kate Chopin's The Story of an Hour – what does Mrs. Mallard feel when she hears of her husband's death?",
+        a: "Initially grief, but then an overwhelming sense of <strong>freedom and relief</strong> – she whispers 'free, free, free.'" },
+      { q: "What is the central conflict in Fay Weldon's Weekend – in one sentence?",
+        a: "Martha exhausts herself meeting everyone's needs during a family weekend <strong>while nobody acknowledges her sacrifice</strong> or her own desires." },
+      { q: "What does Bernardine Evaristo mean by 'The First Feminists'? What argument does the text make?",
+        a: "Evaristo argues <strong>feminism is not a modern Western invention</strong> – women across cultures and centuries have always resisted oppression, reclaiming a global and historical perspective on female agency." },
+      { q: "What does Mrs. Mallard's death at the end of The Story of an Hour symbolize?",
+        a: "She dies when she sees her husband is alive – symbolically: <strong>freedom is not survivable for women</strong> within the social structures of the time. The system kills her, not her heart." },
+      { q: "Compare Martha (Weekend) and Neni (BHTD) – what do they have in common despite their different backgrounds?",
+        a: "Both <strong>sacrifice their own ambitions</strong> for family and survival, both function in roles defined by others – but both also show moments of resistance and inner strength." },
+    ]
+  },
+  {
+    cat: "Grammar",
+    questions: [
+      { q: 'Turn into a participle clause: "The man who was sitting by the window looked tired."',
+        a: '→ <strong>The man sitting by the window looked tired.</strong>' },
+      { q: 'Transform from active to passive: "The bank caused the financial crisis."',
+        a: '→ <strong>The financial crisis was caused by the bank.</strong>' },
+      { q: '"Used to" vs. present perfect – what\'s the difference? Give one example for each.',
+        a: '<strong>"Used to"</strong> = past habit/state, no longer true. <em>"I used to live in New York."</em><br><strong>Present perfect</strong> = past action with present relevance. <em>"I have lived in New York for five years."</em>' },
+      { q: 'Combine using a participle clause: "She was exhausted by the journey. She fell asleep immediately."',
+        a: '→ <strong>Exhausted by the journey, she fell asleep immediately.</strong>' },
+      { q: 'Spot the mistake and correct it: "Having finished his work, the TV was turned on by him."',
+        a: '<strong>Dangling participle</strong> – "Having finished his work" must refer to the subject.<br>Correct: <strong>"Having finished his work, he turned on the TV."</strong>' },
+    ]
+  },
+  {
+    cat: "Wild Card",
+    questions: [
+      { q: "Which character from this year would you most like to have dinner with – and why? Give two reasons in English.",
+        a: "<em>Open – award points for two argued reasons in English, regardless of choice.</em>" },
+      { q: 'What does "conformity" mean? Give an example from any text this year.',
+        a: "<strong>Fitting in / following social norms.</strong><br>E.g. Neni adapts to survive, Mrs. Mallard suppresses her true feelings, Martha functions as the perfect wife and mother." },
+      { q: "Odd one out – which doesn't belong and why: subprime mortgage / green card / collateral / asset",
+        a: "<strong>Green card</strong> – the other three are all financial terms related to the 2008 crisis. Green card is an immigration term." },
+      { q: "Name the authors of all three short texts from 12.1 and one thing they have in common.",
+        a: "<strong>Kate Chopin, Fay Weldon, Bernardine Evaristo</strong> – all three write about women fighting against societal expectations and limited freedom." },
+      { q: "What connects Mrs. Mallard, Neni Jonga, and Martha – in one sentence?",
+        a: "All three women are <strong>trapped by systems</strong> – marriage, immigration law, social expectations – that limit their freedom despite their strength and ambition." },
+    ]
+  },
+];
+
+let teams = [];
+let scores = [];
+let used = DATA.map(c => c.questions.map(() => false));
+let currentCell = null;
+let teamCount = 4;
+
+function setTeamCount(n) {
+  teamCount = n;
+  document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTeamInputs();
+}
+
+const defaultNames = ['Team A','Team B','Team C','Team D','Team E'];
+
+function renderTeamInputs() {
+  const c = document.getElementById('teamInputs');
+  c.innerHTML = '';
+  for (let i = 0; i < teamCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'team-row';
+    row.innerHTML = `
+      <div class="team-dot" style="background:${TEAM_COLORS[i]}"></div>
+      <input type="text" placeholder="${defaultNames[i]}" id="tname${i}" value="${defaultNames[i]}">
+    `;
+    c.appendChild(row);
+  }
+}
+
+renderTeamInputs();
+
+function startGame() {
+  teams = [];
+  scores = [];
+  for (let i = 0; i < teamCount; i++) {
+    const v = document.getElementById(`tname${i}`).value.trim() || defaultNames[i];
+    teams.push(v);
+    scores.push(0);
+  }
+  showScreen('game');
+  renderBoard();
+  renderScoreboard();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  // headers row
+  DATA.forEach((cat, ci) => {
+    const h = document.createElement('div');
+    h.className = `cat-header col-${ci}`;
+    h.style.background = CAT_COLORS[ci];
+    h.textContent = cat.cat;
+    board.appendChild(h);
+  });
+  // question cells
+  POINTS.forEach((pts, ri) => {
+    DATA.forEach((cat, ci) => {
+      const cell = document.createElement('div');
+      cell.className = `cell col-${ci}`;
+      cell.style.background = CAT_COLORS[ci];
+      cell.textContent = pts;
+      if (used[ci][ri]) cell.classList.add('used');
+      cell.onclick = () => openModal(ci, ri);
+      board.appendChild(cell);
+    });
+  });
+}
+
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = '';
+  teams.forEach((t, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'score-chip';
+    chip.id = `chip${i}`;
+    chip.innerHTML = `
+      <div class="team-name" style="border-bottom:2px solid ${TEAM_COLORS[i]}">${t}</div>
+      <div class="team-score" id="score${i}">${scores[i]}</div>
+    `;
+    sb.appendChild(chip);
+  });
+}
+
+function openModal(ci, ri) {
+  if (used[ci][ri]) return;
+  currentCell = {ci, ri};
+  const cat = DATA[ci];
+  const q = cat.questions[ri];
+  const pts = POINTS[ri];
+
+  document.getElementById('modalBadge').textContent = cat.cat;
+  document.getElementById('modalBadge').style.background = CAT_COLORS[ci];
+  document.getElementById('modalPoints').textContent = pts + ' pts';
+  document.getElementById('modalQuestion').textContent = q.q;
+  document.getElementById('modalAnswer').innerHTML = q.a;
+  document.getElementById('modalAnswer').classList.remove('visible');
+  document.getElementById('pointsSection').classList.remove('visible');
+  document.getElementById('showAnswerBtn').style.display = 'inline-block';
+
+  // build team point buttons
+  const pb = document.getElementById('pointsBtns');
+  pb.innerHTML = '';
+  teams.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'point-btn';
+    btn.style.background = TEAM_COLORS[i];
+    btn.textContent = `+${pts} → ${t}`;
+    btn.onclick = () => awardPoints(i, pts);
+    pb.appendChild(btn);
+  });
+
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function showAnswer() {
+  document.getElementById('modalAnswer').classList.add('visible');
+  document.getElementById('pointsSection').classList.add('visible');
+  document.getElementById('showAnswerBtn').style.display = 'none';
+}
+
+function awardPoints(teamIdx, pts) {
+  scores[teamIdx] += pts;
+  document.getElementById(`score${teamIdx}`).textContent = scores[teamIdx];
+  markUsed();
+  closeModal();
+}
+
+function markUsed() {
+  if (!currentCell) return;
+  used[currentCell.ci][currentCell.ri] = true;
+  renderBoard();
+  checkGameOver();
+}
+
+function closeModal() {
+  if (currentCell) markUsed();
+  document.getElementById('modalBg').classList.remove('open');
+  currentCell = null;
+}
+
+function checkGameOver() {
+  const allDone = used.every(col => col.every(v => v));
+  if (allDone) setTimeout(showFinal, 400);
+}
+
+function showFinal() {
+  showScreen('final');
+  const sorted = teams.map((t,i) => ({name:t, score:scores[i], color:TEAM_COLORS[i]}))
+    .sort((a,b) => b.score - a.score);
+  const maxScore = sorted[0].score || 1;
+  const medals = ['🥇','🥈','🥉'];
+  const podium = document.getElementById('podium');
+  podium.innerHTML = '';
+  sorted.forEach((t, i) => {
+    const barH = Math.max(20, Math.round((t.score / maxScore) * 160));
+    const item = document.createElement('div');
+    item.className = 'podium-item';
+    item.innerHTML = `
+      <div class="podium-rank">${medals[i] || ''}</div>
+      <div class="podium-name">${t.name}</div>
+      <div class="podium-score-val">${t.score}</div>
+      <div class="podium-bar" style="height:${barH}px;background:${t.color}"></div>
+    `;
+    podium.appendChild(item);
+  });
+}
+</script>
+</body>
+</html>
