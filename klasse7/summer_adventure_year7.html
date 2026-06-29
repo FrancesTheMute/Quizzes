@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Adventure – Year 7 English</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #0EA5E9;
+    --yellow: #FACC15;
+    --coral: #F97316;
+    --sea: #34D399;
+    --sand: #FEF9EF;
+    --navy: #1E3A5F;
+    --purple: #A855F7;
+    --pink: #EC4899;
+    --white: #ffffff;
+    --shadow: 0 4px 20px rgba(30,58,95,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(180deg, #BAE6FD 0%, #FEF9EF 40%);
+    min-height: 100vh;
+    color: var(--navy);
+  }
+
+  /* ── STICKY SCORE BAR ── */
+  #scorebar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy);
+    color: var(--white);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    flex-wrap: wrap; gap: 8px;
+  }
+  #scorebar h1 { font-family: 'Fredoka One'; font-size: 1.3rem; color: var(--yellow); }
+  .score-pill {
+    background: var(--yellow); color: var(--navy);
+    font-weight: 800; padding: 6px 18px; border-radius: 20px;
+    font-size: 1rem;
+  }
+  .level-dots { display: flex; gap: 6px; }
+  .dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
+    transition: all 0.4s;
+  }
+  .dot.done { background: var(--sea); border-color: var(--sea); }
+  .dot.active { background: var(--yellow); border-color: var(--yellow); animation: pulse 1s infinite; }
+
+  /* ── HERO ── */
+  #hero {
+    text-align: center; padding: 48px 20px 24px;
+    position: relative; overflow: hidden;
+  }
+  #hero h2 { font-family: 'Fredoka One'; font-size: clamp(2rem,6vw,3.5rem); color: var(--navy); line-height: 1.1; }
+  #hero p { font-size: 1.1rem; color: var(--navy); max-width: 560px; margin: 12px auto 24px; }
+  .sun { font-size: 5rem; animation: spin-slow 12s linear infinite; display: inline-block; }
+  .emoji-row { font-size: 2rem; margin: 8px 0; letter-spacing: 6px; }
+
+  /* ── LEVEL CARDS ── */
+  .level-section {
+    max-width: 860px; margin: 0 auto 32px;
+    padding: 0 16px;
+  }
+  .level-card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+    border-top: 6px solid var(--sky);
+    position: relative;
+    transition: opacity 0.3s;
+  }
+  .level-card.locked { opacity: 0.4; pointer-events: none; }
+  .level-card.locked::after {
+    content: '🔒 Complete the previous level first!';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 700; color: var(--navy);
+    background: rgba(255,255,255,0.75); border-radius: 24px;
+    pointer-events: none;
+  }
+  .level-card:nth-child(1) { border-color: var(--sky); }
+  .level-card:nth-child(2) { border-color: var(--sea); }
+  .level-card:nth-child(3) { border-color: var(--coral); }
+  .level-card:nth-child(4) { border-color: var(--purple); }
+  .level-card:nth-child(5) { border-color: var(--pink); }
+  .level-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .level-badge {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One'; font-size: 1.4rem; color: white;
+    flex-shrink: 0;
+  }
+  .badge-1 { background: var(--sky); }
+  .badge-2 { background: var(--sea); }
+  .badge-3 { background: var(--coral); }
+  .badge-4 { background: var(--purple); }
+  .badge-5 { background: var(--pink); }
+  .level-title { font-family: 'Fredoka One'; font-size: 1.5rem; }
+  .level-subtitle { font-size: 0.9rem; color: #666; }
+
+  /* ── WAVE DIVIDER ── */
+  .wave { width: 100%; height: 40px; overflow: hidden; margin: 8px 0 24px; }
+  .wave svg { display: block; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-block; padding: 12px 28px;
+    border-radius: 30px; font-family: 'Nunito'; font-weight: 800;
+    font-size: 1rem; cursor: pointer; border: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary { background: var(--sky); color: white; }
+  .btn-yellow { background: var(--yellow); color: var(--navy); }
+  .btn-coral { background: var(--coral); color: white; }
+  .btn-sea { background: var(--sea); color: var(--navy); }
+  .btn-purple { background: var(--purple); color: white; }
+  .btn-pink { background: var(--pink); color: white; }
+  .btn-sm { padding: 7px 16px; font-size: 0.88rem; }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    border-radius: 14px; padding: 14px 18px;
+    margin-top: 14px; font-weight: 700;
+    display: none; font-size: 1rem;
+  }
+  .feedback-box.show { display: block; animation: slideIn 0.3s ease; }
+  .feedback-box.correct { background: #DCFCE7; color: #166534; border: 2px solid #86EFAC; }
+  .feedback-box.wrong { background: #FEE2E2; color: #991B1B; border: 2px solid #FCA5A5; }
+  .feedback-box.info { background: #EFF6FF; color: #1E40AF; border: 2px solid #BFDBFE; }
+
+  /* ── LEVEL COMPLETE ── */
+  .level-complete {
+    background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+    border-radius: 16px; padding: 20px;
+    text-align: center; margin-top: 20px;
+    border: 2px solid var(--sea);
+    display: none;
+  }
+  .level-complete.show { display: block; animation: bounceIn 0.5s ease; }
+  .level-complete h3 { font-family: 'Fredoka One'; font-size: 1.6rem; color: var(--navy); }
+  .level-complete p { color: #166534; margin: 6px 0 14px; font-weight: 600; }
+
+  /* ── VOCABULARY ── */
+  .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  @media(max-width:500px){ .vocab-grid { grid-template-columns: 1fr; } }
+  .vocab-section-title { font-weight: 800; font-size: 0.9rem; color: var(--sky); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+
+  /* Matching */
+  .match-container { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .match-col { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 6px; }
+  .match-word {
+    padding: 10px 14px; border-radius: 10px; background: #EFF6FF;
+    border: 2px solid #BFDBFE; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; user-select: none; text-align: center;
+  }
+  .match-word:hover { border-color: var(--sky); background: #DBEAFE; }
+  .match-word.selected { border-color: var(--sky); background: var(--sky); color: white; }
+  .match-word.matched-ok { border-color: var(--sea); background: #DCFCE7; color: #166534; cursor: default; }
+  .match-word.matched-err { border-color: #F87171; background: #FEE2E2; color: #991B1B; animation: shake 0.3s; }
+
+  /* Word Search */
+  #wordsearch-grid {
+    display: inline-grid;
+    gap: 2px; margin: 10px 0;
+    font-family: monospace; font-size: 1rem; font-weight: 700;
+    user-select: none;
+  }
+  .ws-cell {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; background: #EFF6FF; cursor: pointer;
+    transition: background 0.15s; border: 1px solid #BFDBFE;
+  }
+  .ws-cell:hover { background: #DBEAFE; }
+  .ws-cell.selecting { background: var(--yellow); }
+  .ws-cell.found { background: var(--sea); color: white; }
+  .ws-wordlist { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .ws-word {
+    padding: 4px 12px; border-radius: 20px; background: #EFF6FF;
+    border: 2px solid #BFDBFE; font-weight: 700; font-size: 0.88rem;
+    transition: all 0.3s;
+  }
+  .ws-word.found { background: var(--sea); color: white; border-color: var(--sea); text-decoration: line-through; }
+
+  /* ── READING ── */
+  .reading-text {
+    background: #F0F9FF; border-radius: 14px; padding: 18px 20px;
+    border-left: 4px solid var(--sky); margin-bottom: 18px;
+    font-size: 0.97rem; line-height: 1.7;
+  }
+  .reading-text h4 { font-family: 'Fredoka One'; color: var(--sky); margin-bottom: 8px; font-size: 1.1rem; }
+  .reading-q { margin-bottom: 14px; }
+  .reading-q label { font-weight: 700; display: block; margin-bottom: 6px; }
+  .reading-q input[type=text] {
+    border: 2px solid #BFDBFE; border-radius: 8px; padding: 8px 12px;
+    font-family: 'Nunito'; font-size: 0.95rem; width: 100%; max-width: 400px;
+    outline: none; transition: border 0.2s;
+  }
+  .reading-q input:focus { border-color: var(--sky); }
+  .reading-q input.correct-input { border-color: var(--sea); background: #DCFCE7; }
+  .reading-q input.wrong-input { border-color: #F87171; background: #FEE2E2; }
+
+  /* ── GRAMMAR ── */
+  .grammar-task { margin-bottom: 24px; padding: 18px; background: #FFF7ED; border-radius: 14px; border: 2px solid #FED7AA; }
+  .grammar-task h4 { font-family: 'Fredoka One'; color: var(--coral); margin-bottom: 12px; font-size: 1.05rem; }
+  /* Drag and drop */
+  .drag-sentence { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 0.97rem; font-weight: 600; }
+  .drag-drop-zone {
+    min-width: 100px; border-bottom: 3px dashed var(--coral);
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px 8px; min-height: 32px; border-radius: 6px;
+    background: rgba(249,115,22,0.07); transition: background 0.2s;
+    cursor: pointer; font-weight: 700; color: var(--coral);
+  }
+  .drag-drop-zone.over { background: rgba(249,115,22,0.2); }
+  .drag-drop-zone.filled { color: var(--navy); background: #FED7AA; border-style: solid; cursor: default; }
+  .drag-options { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .drag-chip {
+    padding: 6px 14px; border-radius: 20px; background: white;
+    border: 2px solid var(--coral); font-weight: 700; font-size: 0.88rem;
+    cursor: grab; transition: all 0.2s; user-select: none;
+  }
+  .drag-chip:hover { background: var(--coral); color: white; }
+  .drag-chip.used { opacity: 0.3; cursor: not-allowed; }
+  /* Gap fill */
+  .gap-fill { font-size: 0.97rem; line-height: 2.2; font-weight: 600; }
+  .gap-fill input {
+    border: none; border-bottom: 3px solid var(--coral);
+    background: transparent; font-family: 'Nunito'; font-size: 0.97rem;
+    font-weight: 700; width: 110px; text-align: center; outline: none;
+    color: var(--navy); padding: 2px 4px;
+  }
+  .gap-fill input.correct-gf { border-color: var(--sea); background: #DCFCE7; border-radius: 4px; }
+  .gap-fill input.wrong-gf { border-color: #F87171; background: #FEE2E2; border-radius: 4px; }
+  /* MC */
+  .mc-option {
+    display: block; padding: 10px 16px; border-radius: 10px;
+    border: 2px solid #FED7AA; background: white; margin: 6px 0;
+    cursor: pointer; font-weight: 600; transition: all 0.2s;
+    width: 100%;
+  }
+  .mc-option:hover { border-color: var(--coral); background: #FFF7ED; }
+  .mc-option.correct { border-color: var(--sea); background: #DCFCE7; color: #166534; }
+  .mc-option.wrong { border-color: #F87171; background: #FEE2E2; color: #991B1B; }
+
+  /* ── RIDDLES ── */
+  .riddle-card {
+    background: linear-gradient(135deg, #FAF5FF, #EDE9FE);
+    border-radius: 14px; padding: 18px; border: 2px solid #DDD6FE;
+    margin-bottom: 14px;
+  }
+  .riddle-card h4 { font-family: 'Fredoka One'; color: var(--purple); margin-bottom: 10px; font-size: 1rem; }
+  .riddle-text { font-style: italic; font-size: 1rem; margin-bottom: 12px; line-height: 1.5; }
+  .riddle-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .riddle-btn {
+    padding: 8px 16px; border-radius: 20px; border: 2px solid #C4B5FD;
+    background: white; font-family: 'Nunito'; font-weight: 700; cursor: pointer;
+    font-size: 0.9rem; transition: all 0.2s;
+  }
+  .riddle-btn:hover { background: var(--purple); color: white; border-color: var(--purple); }
+  .riddle-btn.correct { background: var(--sea); color: white; border-color: var(--sea); }
+  .riddle-btn.wrong { background: #F87171; color: white; border-color: #F87171; }
+
+  /* ── SPEAKING ── */
+  .speaking-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 16px; margin-bottom: 20px; }
+  .speaking-card {
+    background: linear-gradient(135deg, #FFF0F7, #FCE7F3);
+    border-radius: 16px; padding: 20px; border: 2px solid #F9A8D4;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .speaking-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(236,72,153,0.2); }
+  .speaking-card.active { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(236,72,153,0.3); }
+  .speaking-card h4 { font-family: 'Fredoka One'; color: var(--pink); margin-bottom: 8px; }
+  .speaking-card ul { list-style: none; font-size: 0.9rem; }
+  .speaking-card ul li::before { content: '→ '; color: var(--pink); font-weight: 700; }
+  .speaking-card ul li { margin-bottom: 4px; }
+  .timer-display {
+    font-family: 'Fredoka One'; font-size: 3rem; color: var(--pink);
+    text-align: center; margin: 10px 0;
+  }
+  .timer-bar { height: 10px; border-radius: 10px; background: #FCE7F3; overflow: hidden; margin-bottom: 10px; }
+  .timer-fill { height: 100%; background: var(--pink); transition: width 1s linear; width: 100%; border-radius: 10px; }
+
+  /* ── CERTIFICATE ── */
+  #certificate {
+    display: none;
+    max-width: 740px; margin: 0 auto 48px; padding: 0 16px;
+  }
+  #certificate.show { display: block; animation: bounceIn 0.8s ease; }
+  .cert-inner {
+    background: var(--sand);
+    border: 6px double var(--yellow);
+    border-radius: 24px;
+    padding: 40px 36px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(250,204,21,0.3);
+    position: relative; overflow: hidden;
+  }
+  .cert-inner::before {
+    content: '';
+    position: absolute; inset: 8px;
+    border: 2px solid var(--yellow); border-radius: 18px; opacity: 0.4; pointer-events: none;
+  }
+  .cert-emoji { font-size: 4rem; display: block; margin-bottom: 6px; }
+  .cert-school { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; color: var(--coral); font-weight: 700; margin-bottom: 12px; }
+  .cert-title { font-family: 'Fredoka One'; font-size: clamp(1.8rem,5vw,2.8rem); color: var(--navy); margin-bottom: 6px; }
+  .cert-sub { font-size: 1rem; color: #666; margin-bottom: 20px; }
+  .cert-name-line {
+    border-bottom: 3px solid var(--navy); display: inline-block;
+    min-width: 280px; margin: 12px 0; padding-bottom: 6px;
+  }
+  .cert-name-input {
+    border: none; background: transparent; font-family: 'Fredoka One';
+    font-size: 1.6rem; text-align: center; color: var(--navy); outline: none;
+    width: 280px;
+  }
+  .cert-scores { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 18px 0; }
+  .cert-score-pill { padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 0.9rem; }
+  .cert-footer { font-size: 0.85rem; color: #888; margin-top: 18px; }
+  .cert-stars { font-size: 2rem; letter-spacing: 6px; }
+  .confetti-burst { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes pulse { 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.2) } }
+  @keyframes spin-slow { from{ transform:rotate(0deg) } to{ transform:rotate(360deg) } }
+  @keyframes slideIn { from{ opacity:0; transform:translateY(-10px) } to{ opacity:1; transform:translateY(0) } }
+  @keyframes bounceIn {
+    0%{ opacity:0; transform:scale(0.7) }
+    60%{ transform:scale(1.05) }
+    100%{ opacity:1; transform:scale(1) }
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .float { animation: float 3s ease-in-out infinite; }
+
+  /* MC for vocab */
+  .mc-vocab { margin-bottom: 12px; }
+  .mc-vocab p { font-weight: 700; margin-bottom: 6px; }
+
+  /* progress within level */
+  .mini-progress { font-size: 0.85rem; color: #888; margin-bottom: 6px; }
+  .pts-badge {
+    display: inline-block; background: var(--yellow); color: var(--navy);
+    border-radius: 20px; padding: 3px 10px; font-size: 0.8rem; font-weight: 800; margin-left: 8px;
+  }
+  hr.section-sep { border: none; border-top: 2px dashed #E2E8F0; margin: 20px 0; }
+
+  @media print {
+    #scorebar, .level-section, .wave, #hero { display: none !important; }
+    #certificate { display: block !important; }
+    .cert-inner { border-color: #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCORE BAR -->
+<div id="scorebar">
+  <h1>☀️ Summer Adventure</h1>
+  <div class="level-dots">
+    <div class="dot active" id="dot-1" title="Level 1"></div>
+    <div class="dot" id="dot-2" title="Level 2"></div>
+    <div class="dot" id="dot-3" title="Level 3"></div>
+    <div class="dot" id="dot-4" title="Level 4"></div>
+    <div class="dot" id="dot-5" title="Level 5"></div>
+  </div>
+  <div class="score-pill">⭐ <span id="total-score">0</span> pts</div>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <span class="sun">☀️</span>
+  <h2>Year 7 English<br>Summer Adventure!</h2>
+  <p>Complete all 5 levels, collect points and earn your <strong>Summer Certificate</strong>. Good luck – and have fun! 🌴</p>
+  <div class="emoji-row">🏖️ 🌊 🍦 ✈️ 🎒 🦀</div>
+</div>
+
+<!-- WAVE -->
+<div class="wave"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 C200,40 400,0 600,20 C800,40 1000,0 1200,20 L1200,40 L0,40 Z" fill="#0EA5E9" opacity="0.15"/></svg></div>
+
+<!-- ═══════════════════════════════════════════
+     LEVEL 1 – VOCABULARY
+════════════════════════════════════════════ -->
+<div class="level-section">
+<div class="level-card" id="card-1">
+  <div class="level-header">
+    <div class="level-badge badge-1">1</div>
+    <div>
+      <div class="level-title">🏝️ Vocabulary Explorer</div>
+      <div class="level-subtitle">Match, choose & find summer words! <span class="pts-badge">Max 30 pts</span></div>
+    </div>
+  </div>
+
+  <!-- 1A: Matching -->
+  <div class="vocab-section-title">🔗 Part A – Match the words!</div>
+  <p style="font-size:0.9rem;margin-bottom:10px;">Click a word on the left, then click its meaning on the right.</p>
+  <div class="match-container" id="match-container"></div>
+  <div id="match-feedback" class="feedback-box"></div>
+
+  <hr class="section-sep">
+
+  <!-- 1B: Multiple Choice -->
+  <div class="vocab-section-title">✅ Part B – Choose the right word!</div>
+  <div id="vocab-mc-container"></div>
+
+  <hr class="section-sep">
+
+  <!-- 1C: Word Search -->
+  <div class="vocab-section-title">🔍 Part C – Word Search!</div>
+  <p style="font-size:0.9rem;margin-bottom:8px;">Find all 6 summer words hidden in the grid. Click & drag to select!</p>
+  <div id="wordsearch-grid"></div>
+  <div class="ws-wordlist" id="ws-wordlist"></div>
+  <div id="ws-feedback" class="feedback-box"></div>
+
+  <br>
+  <button class="btn btn-primary" id="check-level1" onclick="checkLevel1()">Check Answers ✓</button>
+  <div class="level-complete" id="complete-1">
+    <h3>🏅 Level 1 Complete!</h3>
+    <p id="l1-score-msg"></p>
+    <button class="btn btn-sea" onclick="unlockLevel(2)">Go to Level 2 →</button>
+  </div>
+</div>
+</div>
+
+<div class="wave"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 C200,0 400,40 600,20 C800,0 1000,40 1200,20 L1200,40 L0,40 Z" fill="#34D399" opacity="0.15"/></svg></div>
+
+<!-- ═══════════════════════════════════════════
+     LEVEL 2 – READING
+════════════════════════════════════════════ -->
+<div class="level-section">
+<div class="level-card locked" id="card-2">
+  <div class="level-header">
+    <div class="level-badge badge-2">2</div>
+    <div>
+      <div class="level-title">📖 Reading Quest</div>
+      <div class="level-subtitle">Read the text and answer 6 questions! <span class="pts-badge">Max 24 pts</span></div>
+    </div>
+  </div>
+
+  <div class="reading-text">
+    <h4>My Amazing Summer Holiday</h4>
+    <p>Last summer, my family and I travelled to Spain for two weeks. We flew from Hamburg airport early in the morning and arrived in Barcelona at noon. The weather was fantastic – sunny and very hot every day!</p>
+    <p>We stayed in a small hotel near the beach. Every morning, I woke up early and went for a swim in the sea. The water was warm and crystal clear. My little brother, Finn, built sandcastles on the beach while my parents read books under a big umbrella.</p>
+    <p>In the afternoons, we often visited the city centre. Barcelona has incredible buildings, especially the famous church called the Sagrada Família. We also tried lots of local food. My favourite was paella, a rice dish with seafood and vegetables.</p>
+    <p>On our last evening, we watched the sun go down over the sea. It was the most beautiful thing I have ever seen. I can't wait to go back next summer!</p>
+  </div>
+
+  <div id="reading-qs"></div>
+  <button class="btn btn-sea" onclick="checkLevel2()">Check My Answers ✓</button>
+  <div class="level-complete" id="complete-2">
+    <h3>📚 Level 2 Complete!</h3>
+    <p id="l2-score-msg"></p>
+    <button class="btn btn-coral" onclick="unlockLevel(3)">Go to Level 3 →</button>
+  </div>
+</div>
+</div>
+
+<div class="wave"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 C200,40 400,0 600,20 C800,40 1000,0 1200,20 L1200,40 L0,40 Z" fill="#F97316" opacity="0.15"/></svg></div>
+
+<!-- ═══════════════════════════════════════════
+     LEVEL 3 – GRAMMAR
+════════════════════════════════════════════ -->
+<div class="level-section">
+<div class="level-card locked" id="card-3">
+  <div class="level-header">
+    <div class="level-badge badge-3">3</div>
+    <div>
+      <div class="level-title">⚡ Grammar Challenge</div>
+      <div class="level-subtitle">Drag, fill & choose – show your grammar power! <span class="pts-badge">Max 30 pts</span></div>
+    </div>
+  </div>
+  <div id="grammar-container"></div>
+  <button class="btn btn-coral" onclick="checkLevel3()">Check Grammar ✓</button>
+  <div class="level-complete" id="complete-3">
+    <h3>🎯 Level 3 Complete!</h3>
+    <p id="l3-score-msg"></p>
+    <button class="btn btn-purple" onclick="unlockLevel(4)">Go to Level 4 →</button>
+  </div>
+</div>
+</div>
+
+<div class="wave"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 C200,0 400,40 600,20 C800,0 1000,40 1200,20 L1200,40 L0,40 Z" fill="#A855F7" opacity="0.15"/></svg></div>
+
+<!-- ═══════════════════════════════════════════
+     LEVEL 4 – RIDDLES
+════════════════════════════════════════════ -->
+<div class="level-section">
+<div class="level-card locked" id="card-4">
+  <div class="level-header">
+    <div class="level-badge badge-4">4</div>
+    <div>
+      <div class="level-title">🔮 Riddles & Mystery</div>
+      <div class="level-subtitle">Can you solve all 8 riddles? <span class="pts-badge">Max 16 pts</span></div>
+    </div>
+  </div>
+  <div id="riddles-container"></div>
+  <div class="level-complete" id="complete-4">
+    <h3>🧩 Level 4 Complete!</h3>
+    <p id="l4-score-msg"></p>
+    <button class="btn btn-pink" onclick="unlockLevel(5)">Go to Level 5 →</button>
+  </div>
+</div>
+</div>
+
+<div class="wave"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 C200,40 400,0 600,20 C800,40 1000,0 1200,20 L1200,40 L0,40 Z" fill="#EC4899" opacity="0.15"/></svg></div>
+
+<!-- ═══════════════════════════════════════════
+     LEVEL 5 – PARTNER SPEAKING
+════════════════════════════════════════════ -->
+<div class="level-section">
+<div class="level-card locked" id="card-5">
+  <div class="level-header">
+    <div class="level-badge badge-5">5</div>
+    <div>
+      <div class="level-title">🗣️ Partner Challenge</div>
+      <div class="level-subtitle">Speak English together for 2–3 minutes! <span class="pts-badge">+20 bonus pts</span></div>
+    </div>
+  </div>
+
+  <p style="margin-bottom:16px;font-weight:600;">Choose a speaking card, work with your partner and use the timer. Your teacher will award bonus points!</p>
+
+  <div class="speaking-cards" id="speaking-cards-container"></div>
+
+  <div id="selected-card-display" style="display:none; background:#FFF0F7; border-radius:14px; padding:16px; border:2px solid #F9A8D4; margin-bottom:16px;">
+    <h4 style="font-family:'Fredoka One'; color:var(--pink); margin-bottom:8px;" id="sc-title"></h4>
+    <ul id="sc-prompts" style="list-style:none; font-size:0.95rem;"></ul>
+  </div>
+
+  <div style="text-align:center; margin:16px 0;">
+    <div class="timer-display" id="timer-display">2:30</div>
+    <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+    <button class="btn btn-pink" id="timer-btn" onclick="toggleTimer()">▶ Start Timer</button>
+    <button class="btn btn-sm" style="background:#E2E8F0;margin-left:8px;" onclick="resetTimer()">↺ Reset</button>
+  </div>
+
+  <div style="background:#FFF0F7; border-radius:12px; padding:14px; border:2px solid #F9A8D4;">
+    <p style="font-weight:700; margin-bottom:6px;">🎤 Remember to:</p>
+    <ul style="list-style:none; font-size:0.9rem; line-height:1.8;">
+      <li>✅ Speak only in English</li>
+      <li>✅ Listen carefully to your partner</li>
+      <li>✅ Ask questions and give reasons</li>
+      <li>✅ Take turns – don't speak alone!</li>
+    </ul>
+  </div>
+  <br>
+  <p style="font-size:0.9rem; color:#888; margin-bottom:10px;">When you've finished, ask your teacher to award your bonus points.</p>
+  <button class="btn btn-pink" onclick="claimSpeaking()">🎉 We're Done! Claim Bonus Points</button>
+  <div class="level-complete" id="complete-5">
+    <h3>🌟 All Levels Complete!</h3>
+    <p id="l5-score-msg"></p>
+    <button class="btn btn-yellow" onclick="showCertificate()">🎓 Get Your Certificate!</button>
+  </div>
+</div>
+</div>
+
+<!-- CERTIFICATE -->
+<div id="certificate">
+  <div class="cert-inner">
+    <span class="cert-emoji float">🏆</span>
+    <div class="cert-school">Year 7 English · Summer 2025</div>
+    <div class="cert-title">Summer Adventure Certificate</div>
+    <p class="cert-sub">This certifies that</p>
+    <div class="cert-name-line">
+      <input class="cert-name-input" type="text" placeholder="Your Name" id="cert-name" maxlength="30">
+    </div>
+    <p style="margin:10px 0 4px; font-weight:600; font-size:0.95rem;">has successfully completed</p>
+    <p style="font-family:'Fredoka One'; font-size:1.4rem; color:var(--sky);">Year 7 English!</p>
+    <div class="cert-scores" id="cert-scores-display"></div>
+    <div class="cert-stars">⭐⭐⭐</div>
+    <p style="font-family:'Fredoka One'; font-size:1.2rem; margin:10px 0; color:var(--coral);">Total Score: <span id="cert-total"></span> pts</p>
+    <p style="font-style:italic; font-size:0.95rem; color:#555; margin:8px 0;">"Congratulations! You completed Year 7 English!"</p>
+    <div class="cert-footer">
+      🌴 Have a wonderful summer holiday! 🌴<br>
+      <small>Awarded June 2025</small>
+    </div>
+    <button class="btn btn-yellow" style="margin-top:18px;" onclick="window.print()">🖨️ Print Certificate</button>
+  </div>
+</div>
+
+<div style="height:40px;"></div>
+<canvas class="confetti-burst" id="confetti-canvas"></canvas>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  score: { l1:0, l2:0, l3:0, l4:0, l5:0 },
+  done: { l1:false, l2:false, l3:false, l4:false, l5:false }
+};
+function addScore(level, pts) {
+  state.score['l'+level] += pts;
+  document.getElementById('total-score').textContent = Object.values(state.score).reduce((a,b)=>a+b,0);
+}
+function totalScore() { return Object.values(state.score).reduce((a,b)=>a+b,0); }
+
+// ═══════════════════════════════════════════
+// LEVEL UNLOCK
+// ═══════════════════════════════════════════
+function unlockLevel(n) {
+  const card = document.getElementById('card-'+n);
+  card.classList.remove('locked');
+  document.getElementById('dot-'+(n-1)).classList.remove('active');
+  document.getElementById('dot-'+(n-1)).classList.add('done');
+  if(n<=5) document.getElementById('dot-'+n).classList.add('active');
+  card.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ═══════════════════════════════════════════
+// ═══  LEVEL 1: VOCABULARY  ═══════════════
+// ═══════════════════════════════════════════
+
+// ─── MATCHING ───
+const matchPairs = [
+  { word:'suitcase', def:'a big bag you take on holiday' },
+  { word:'sunscreen', def:'cream to protect your skin' },
+  { word:'souvenir', def:'a gift you buy to remember a place' },
+  { word:'departure', def:'when a plane or train leaves' },
+  { word:'passport', def:'a document for travelling abroad' },
+  { word:'destination', def:'the place you are travelling to' },
+];
+let matchSelected = null;
+let matchCorrect = 0;
+function buildMatching() {
+  const c = document.getElementById('match-container');
+  const leftCol = document.createElement('div'); leftCol.className='match-col';
+  const rightCol = document.createElement('div'); rightCol.className='match-col';
+  const shuffledDefs = [...matchPairs].sort(()=>Math.random()-0.5);
+  matchPairs.forEach(p=>{
+    const w = document.createElement('div');
+    w.className='match-word'; w.textContent=p.word; w.dataset.type='word'; w.dataset.key=p.word;
+    w.onclick=()=>handleMatch(w);
+    leftCol.appendChild(w);
+  });
+  shuffledDefs.forEach(p=>{
+    const d = document.createElement('div');
+    d.className='match-word'; d.textContent=p.def; d.dataset.type='def'; d.dataset.key=p.word;
+    d.onclick=()=>handleMatch(d);
+    rightCol.appendChild(d);
+  });
+  c.appendChild(leftCol); c.appendChild(rightCol);
+}
+function handleMatch(el) {
+  if(el.classList.contains('matched-ok')) return;
+  if(!matchSelected) {
+    if(matchSelected) matchSelected.classList.remove('selected');
+    matchSelected = el;
+    el.classList.add('selected');
+  } else {
+    if(matchSelected === el) { el.classList.remove('selected'); matchSelected=null; return; }
+    if(matchSelected.dataset.type === el.dataset.type) {
+      matchSelected.classList.remove('selected'); matchSelected=el; el.classList.add('selected'); return;
+    }
+    const a=matchSelected, b=el;
+    a.classList.remove('selected');
+    if(a.dataset.key === b.dataset.key) {
+      a.classList.add('matched-ok'); b.classList.add('matched-ok');
+      matchCorrect++;
+    } else {
+      a.classList.add('matched-err'); b.classList.add('matched-err');
+      setTimeout(()=>{ a.classList.remove('matched-err'); b.classList.remove('matched-err'); },700);
+    }
+    matchSelected=null;
+  }
+}
+
+// ─── MC VOCAB ───
+const vocabMC = [
+  { q:'A person who travels to see tourist attractions is called a …', opts:['traveller','tourist','passenger','explorer'], ans:1 },
+  { q:'The place at the airport where you show your ticket before boarding is called …', opts:['customs','baggage claim','check-in','departure lounge'], ans:2 },
+  { q:'The bags and cases you bring on a trip are your …', opts:['cargo','luggage','parcel','freight'], ans:1 },
+  { q:'When a flight is stopped because of bad weather, it is …', opts:['cancelled','delayed','rerouted','overbooked'], ans:0 },
+];
+let vocabMCscore = 0;
+function buildVocabMC() {
+  const c = document.getElementById('vocab-mc-container');
+  vocabMC.forEach((item,i)=>{
+    const div = document.createElement('div'); div.className='mc-vocab';
+    div.innerHTML=`<p>${i+1}. ${item.q}</p>`;
+    item.opts.forEach((opt,j)=>{
+      const btn = document.createElement('button');
+      btn.className='mc-option'; btn.textContent=opt;
+      btn.onclick=()=>{
+        if(div.dataset.done) return; div.dataset.done='1';
+        if(j===item.ans){ btn.classList.add('correct'); vocabMCscore++; }
+        else { btn.classList.add('wrong'); div.querySelectorAll('.mc-option')[item.ans].classList.add('correct'); }
+      };
+      div.appendChild(btn);
+    });
+    c.appendChild(div);
+  });
+}
+
+// ─── WORD SEARCH ───
+const wsWords = ['BEACH','HOTEL','FLIGHT','SUMMER','TRAVEL','SUNNY'];
+const wsGridSize = 9;
+let wsGrid = [], wsCells = [], wsSelecting=false, wsStart=null, wsEnd=null, wsFoundWords=new Set();
+
+function buildWordSearch() {
+  wsGrid = Array.from({length:wsGridSize},()=>Array(wsGridSize).fill(''));
+  // Place words
+  const directions = [[0,1],[1,0],[1,1]];
+  wsWords.forEach(word=>{
+    let placed=false, attempts=0;
+    while(!placed && attempts<200){
+      attempts++;
+      const [dr,dc]=directions[Math.floor(Math.random()*directions.length)];
+      const maxR= wsGridSize-(dr?word.length:0);
+      const maxC= wsGridSize-(dc?word.length:0);
+      if(maxR<=0||maxC<=0) continue;
+      const r=Math.floor(Math.random()*maxR);
+      const c=Math.floor(Math.random()*maxC);
+      let ok=true;
+      for(let k=0;k<word.length;k++){
+        const v=wsGrid[r+dr*k][c+dc*k];
+        if(v&&v!==word[k]){ok=false;break;}
+      }
+      if(ok){ for(let k=0;k<word.length;k++) wsGrid[r+dr*k][c+dc*k]=word[k]; placed=true; }
+    }
+  });
+  // Fill blanks
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<wsGridSize;r++) for(let c=0;c<wsGridSize;c++)
+    if(!wsGrid[r][c]) wsGrid[r][c]=letters[Math.floor(Math.random()*letters.length)];
+
+  // Build DOM
+  const grid=document.getElementById('wordsearch-grid');
+  grid.style.gridTemplateColumns=`repeat(${wsGridSize},32px)`;
+  wsCells=[];
+  for(let r=0;r<wsGridSize;r++){
+    wsCells[r]=[];
+    for(let c=0;c<wsGridSize;c++){
+      const cell=document.createElement('div'); cell.className='ws-cell';
+      cell.textContent=wsGrid[r][c]; cell.dataset.r=r; cell.dataset.c=c;
+      grid.appendChild(cell); wsCells[r][c]=cell;
+    }
+  }
+  // Mouse events
+  grid.addEventListener('mousedown',e=>{ if(e.target.classList.contains('ws-cell')){ wsSelecting=true; wsStart={r:+e.target.dataset.r,c:+e.target.dataset.c}; wsHighlight(wsStart,wsStart); } });
+  grid.addEventListener('mousemove',e=>{ if(wsSelecting&&e.target.classList.contains('ws-cell')){ wsEnd={r:+e.target.dataset.r,c:+e.target.dataset.c}; wsHighlight(wsStart,wsEnd); } });
+  document.addEventListener('mouseup',e=>{ if(wsSelecting){ wsSelecting=false; wsCheckSelection(); } });
+  // Touch
+  grid.addEventListener('touchstart',e=>{ const t=e.touches[0]; const el=document.elementFromPoint(t.clientX,t.clientY); if(el&&el.classList.contains('ws-cell')){ wsSelecting=true; wsStart={r:+el.dataset.r,c:+el.dataset.c}; wsHighlight(wsStart,wsStart); e.preventDefault(); } },{passive:false});
+  grid.addEventListener('touchmove',e=>{ const t=e.touches[0]; const el=document.elementFromPoint(t.clientX,t.clientY); if(wsSelecting&&el&&el.classList.contains('ws-cell')){ wsEnd={r:+el.dataset.r,c:+el.dataset.c}; wsHighlight(wsStart,wsEnd); e.preventDefault(); } },{passive:false});
+  document.addEventListener('touchend',()=>{ if(wsSelecting){ wsSelecting=false; wsCheckSelection(); } });
+
+  // Word list
+  const wl=document.getElementById('ws-wordlist');
+  wsWords.forEach(w=>{ const s=document.createElement('span'); s.className='ws-word'; s.textContent=w; s.id='ws-'+w; wl.appendChild(s); });
+}
+
+function wsCellsInLine(s,e) {
+  const cells=[];
+  let dr=Math.sign(e.r-s.r), dc=Math.sign(e.c-s.c);
+  let len=Math.max(Math.abs(e.r-s.r),Math.abs(e.c-s.c))+1;
+  // Only allow horizontal, vertical, diagonal
+  if(s.r!==e.r && s.c!==e.c && Math.abs(e.r-s.r)!==Math.abs(e.c-s.c)) return [];
+  for(let i=0;i<len;i++) cells.push({r:s.r+dr*i,c:s.c+dc*i});
+  return cells;
+}
+
+function wsHighlight(s,e) {
+  // Clear old selecting
+  for(let r=0;r<wsGridSize;r++) for(let c=0;c<wsGridSize;c++)
+    wsCells[r][c].classList.remove('selecting');
+  const line=wsCellsInLine(s,e);
+  line.forEach(p=>{ if(wsCells[p.r]&&wsCells[p.r][p.c]) wsCells[p.r][p.c].classList.add('selecting'); });
+}
+
+function wsCheckSelection() {
+  if(!wsStart||!wsEnd) return;
+  const line=wsCellsInLine(wsStart,wsEnd);
+  const word=line.map(p=>wsGrid[p.r][p.c]).join('');
+  const wordRev=word.split('').reverse().join('');
+  const found=wsWords.find(w=>w===word||w===wordRev);
+  for(let r=0;r<wsGridSize;r++) for(let c=0;c<wsGridSize;c++) wsCells[r][c].classList.remove('selecting');
+  if(found && !wsFoundWords.has(found)){
+    wsFoundWords.add(found);
+    line.forEach(p=>wsCells[p.r][p.c].classList.add('found'));
+    document.getElementById('ws-'+found).classList.add('found');
+    if(wsFoundWords.size===wsWords.length){
+      const fb=document.getElementById('ws-feedback');
+      fb.textContent='🎉 Amazing! You found all the words!'; fb.className='feedback-box info show';
+    }
+  }
+  wsStart=null; wsEnd=null;
+}
+
+// ─── CHECK LEVEL 1 ───
+function checkLevel1() {
+  let pts=0;
+  pts += matchCorrect * 2; // 6 matches × 2 = 12
+  pts += vocabMCscore * 2; // 4 × 2 = 8
+  pts += wsFoundWords.size * 1 + (wsFoundWords.size===wsWords.length?4:0); // 6+4=10
+  pts = Math.min(pts, 30);
+  addScore(1, pts);
+  state.done.l1=true;
+  const comp=document.getElementById('complete-1');
+  document.getElementById('l1-score-msg').textContent=`You earned ${pts} out of 30 points! ${pts>=25?'🌟 Excellent!':pts>=15?'👍 Good job!':'Keep practising!'}`;
+  comp.classList.add('show');
+  comp.scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// ═══  LEVEL 2: READING  ══════════════════
+// ═══════════════════════════════════════════
+const readingQs = [
+  { q:'Where did the family go for their summer holiday?', accept:['spain','barcelona'] },
+  { q:'How long did they stay?', accept:['two weeks','2 weeks','14 days'] },
+  { q:'What did the narrator do every morning?', accept:['swim','swimming','swam','went for a swim','swim in the sea'] },
+  { q:'What did Finn (the little brother) do on the beach?', accept:['sandcastles','built sandcastles','build sandcastles'] },
+  { q:'What famous building did they visit in Barcelona?', accept:['sagrada familia','sagrada família','the sagrada familia','church'] },
+  { q:'What was the narrator\'s favourite food?', accept:['paella'] },
+];
+let l2score=0;
+function buildReading() {
+  const c=document.getElementById('reading-qs');
+  readingQs.forEach((item,i)=>{
+    const div=document.createElement('div'); div.className='reading-q';
+    div.innerHTML=`<label>${i+1}. ${item.q}</label><input type="text" id="rq-${i}" placeholder="Your answer…">`;
+    c.appendChild(div);
+  });
+}
+function checkLevel2() {
+  l2score=0;
+  readingQs.forEach((item,i)=>{
+    const inp=document.getElementById('rq-'+i);
+    const val=inp.value.trim().toLowerCase();
+    const ok=item.accept.some(a=>val.includes(a));
+    inp.classList.toggle('correct-input',ok);
+    inp.classList.toggle('wrong-input',!ok);
+    if(ok) l2score++;
+  });
+  const pts=l2score*4;
+  addScore(2,pts);
+  state.done.l2=true;
+  document.getElementById('l2-score-msg').textContent=`You got ${l2score}/6 correct – that's ${pts} points! ${pts>=20?'🌟 Brilliant!':pts>=12?'👍 Well done!':'Read the text again next time!'}`;
+  document.getElementById('complete-2').classList.add('show');
+  document.getElementById('complete-2').scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// ═══  LEVEL 3: GRAMMAR  ══════════════════
+// ═══════════════════════════════════════════
+
+// --- DRAG & DROP helper (click-based for iPad) ---
+let dragSource=null;
+function buildGrammar() {
+  const c=document.getElementById('grammar-container');
+
+  // Task A: If-clauses Type 1 – chips rendered shuffled by JS
+  c.innerHTML += `
+  <div class="grammar-task" id="gram-a">
+    <h4>🌤️ Task A – If-Clauses Type 1 &nbsp;<small style="font-size:0.75rem;color:#888;">(Tap a word, then tap a gap)</small></h4>
+    <div class="drag-sentence">If it <div class="drag-drop-zone" data-correct="rains" id="dz-a1">…</div> tomorrow, we <div class="drag-drop-zone" data-correct="will stay" id="dz-a2">…</div> at home.</div>
+    <div class="drag-sentence">If you <div class="drag-drop-zone" data-correct="study" id="dz-a3">…</div> hard, you <div class="drag-drop-zone" data-correct="will pass" id="dz-a4">…</div> the exam.</div>
+    <div class="drag-sentence">She <div class="drag-drop-zone" data-correct="will come" id="dz-a5">…</div> to the party if she <div class="drag-drop-zone" data-correct="finishes" id="dz-a6">…</div> work early.</div>
+    <div class="drag-options" id="dag-a"></div>
+    <p style="font-size:0.82rem;color:#888;">Tap a word, then tap a gap to place it. Tap a filled gap to swap it out.</p>
+  </div>`;
+
+  // Task B: If-clauses Type 2 – MC
+  c.innerHTML += `
+  <div class="grammar-task" id="gram-b">
+    <h4>🌙 Task B – If-Clauses Type 2 &nbsp;<small style="font-size:0.75rem;color:#888;">(Choose the correct option)</small></h4>
+    <div id="gram-b-mc"></div>
+  </div>`;
+
+  // Task C: Relative clauses – gap fill
+  c.innerHTML += `
+  <div class="grammar-task" id="gram-c">
+    <h4>🔗 Task C – Relative Clauses &nbsp;<small style="font-size:0.75rem;color:#888;">(Fill in: who / which / where / – )</small></h4>
+    <div class="gap-fill">
+      <p>1. The hotel <input type="text" id="rc1" placeholder="…"> we stayed was amazing.</p>
+      <p>2. The woman <input type="text" id="rc2" placeholder="…"> checked us in was very friendly.</p>
+      <p>3. The book <input type="text" id="rc3" placeholder="…"> I read on the beach was exciting.</p>
+      <p>4. The city <input type="text" id="rc4" placeholder="…"> we visited has beautiful buildings.</p>
+      <p>5. The ice cream <input type="text" id="rc5" placeholder="…"> I bought tasted wonderful. <em style="font-size:0.8rem;color:#aaa;">(contact clause ok)</em></p>
+    </div>
+  </div>`;
+
+  // Task D: Simple past vs past progressive – gap fill
+  c.innerHTML += `
+  <div class="grammar-task" id="gram-d">
+    <h4>⏰ Task D – Simple Past vs. Past Progressive &nbsp;<small style="font-size:0.75rem;color:#888;">(Fill in the correct form)</small></h4>
+    <div class="gap-fill">
+      <p>1. While I <input type="text" id="pp1" placeholder="…"> (swim), my phone <input type="text" id="pp2" placeholder="…"> (ring).</p>
+      <p>2. She <input type="text" id="pp3" placeholder="…"> (read) a book when the sun <input type="text" id="pp4" placeholder="…"> (go) down.</p>
+      <p>3. We <input type="text" id="pp5" placeholder="…"> (have) lunch when it <input type="text" id="pp6" placeholder="…"> (start) to rain.</p>
+    </div>
+  </div>`;
+
+  // Task E: Present perfect vs simple past – MC
+  c.innerHTML += `
+  <div class="grammar-task" id="gram-e">
+    <h4>🕰️ Task E – Present Perfect vs. Simple Past &nbsp;<small style="font-size:0.75rem;color:#888;">(Choose the correct tense)</small></h4>
+    <div id="gram-e-mc"></div>
+  </div>`;
+
+  buildGramMC_B();
+  buildGramMC_E();
+
+  // Render Task A chips in shuffled order
+  const chipWords = ['rains','will stay','study','will pass','will come','finishes'];
+  chipWords.sort(()=>Math.random()-0.5);
+  const dagA = document.getElementById('dag-a');
+  chipWords.forEach(word=>{
+    const chip = document.createElement('div');
+    chip.className='drag-chip'; chip.dataset.id=word; chip.textContent=word;
+    chip.onclick=()=>clickChip(chip,'a');
+    dagA.appendChild(chip);
+  });
+
+  // Zone click listeners for drag
+  document.querySelectorAll('.drag-drop-zone').forEach(zone=>{
+    zone.addEventListener('click',()=>{
+      if(chipSelected){ placeChip(chipSelected,zone); }
+      else if(zone.classList.contains('filled')){
+        // tap a filled zone without a chip selected → return its chip so it can be re-placed
+        const old=zone.dataset.placed;
+        if(old){
+          const prev=document.querySelector(`.drag-chip[data-id="${old}"]`);
+          if(prev){ prev.classList.remove('used'); prev.style.opacity=''; }
+        }
+        zone.textContent='…'; zone.classList.remove('filled'); delete zone.dataset.placed;
+      }
+    });
+  });
+}
+
+let chipSelected=null;
+function clickChip(chip, group) {
+  if(chip.classList.contains('used')) return;
+  document.querySelectorAll('.drag-chip').forEach(c=>c.style.outline='');
+  chipSelected=chip;
+  chip.style.outline='3px solid var(--coral)';
+}
+
+function placeChip(chip, zone) {
+  if(zone.classList.contains('filled')) {
+    // Return current occupant
+    const old=zone.dataset.placed;
+    if(old){
+      const prev=document.querySelector(`.drag-chip[data-id="${old}"]`);
+      if(prev){ prev.classList.remove('used'); prev.style.opacity=''; }
+    }
+  }
+  zone.textContent=chip.dataset.id;
+  zone.classList.add('filled');
+  zone.dataset.placed=chip.dataset.id;
+  chip.classList.add('used'); chip.style.opacity='0.3'; chip.style.outline='';
+  chipSelected=null;
+}
+
+const gramB_MC = [
+  { q:'If I <strong>had</strong> a million euros, I ______ around the world.', opts:['travel','would travel','will travel','travelled'], ans:1 },
+  { q:'If she ______ the answer, she would tell you.', opts:['knows','would know','knew','know'], ans:2 },
+  { q:'We ______ a dog if we lived in a bigger house.', opts:['have got','would have','will have','had'], ans:1 },
+];
+let gramBScore=0;
+function buildGramMC_B() {
+  const c=document.getElementById('gram-b-mc');
+  gramB_MC.forEach((item,i)=>{
+    const div=document.createElement('div'); div.style.marginBottom='12px';
+    div.innerHTML=`<p style="font-weight:700;margin-bottom:6px;">${i+1}. ${item.q}</p>`;
+    item.opts.forEach((opt,j)=>{
+      const btn=document.createElement('button'); btn.className='mc-option'; btn.textContent=opt;
+      btn.onclick=()=>{
+        if(div.dataset.done) return; div.dataset.done='1';
+        if(j===item.ans){ btn.classList.add('correct'); gramBScore++; }
+        else { btn.classList.add('wrong'); div.querySelectorAll('.mc-option')[item.ans].classList.add('correct'); }
+      };
+      div.appendChild(btn);
+    });
+    c.appendChild(div);
+  });
+}
+
+const gramE_MC = [
+  { q:'I ______ Barcelona last year. (specific past time)', opts:['have visited','visited'], ans:1 },
+  { q:'She ______ never ______ paella before. (life experience)', opts:['never ate','has never eaten'], ans:1 },
+  { q:'We ______ just ______ home. (recent action)', opts:['just arrived','have just arrived'], ans:1 },
+  { q:'When ______ you ______ to Spain? (specific past)', opts:['did / travel','have / travelled'], ans:0 },
+];
+let gramEScore=0;
+function buildGramMC_E() {
+  const c=document.getElementById('gram-e-mc');
+  gramE_MC.forEach((item,i)=>{
+    const div=document.createElement('div'); div.style.marginBottom='12px';
+    div.innerHTML=`<p style="font-weight:700;margin-bottom:6px;">${i+1}. ${item.q}</p>`;
+    item.opts.forEach((opt,j)=>{
+      const btn=document.createElement('button'); btn.className='mc-option'; btn.textContent=opt;
+      btn.onclick=()=>{
+        if(div.dataset.done) return; div.dataset.done='1';
+        if(j===item.ans){ btn.classList.add('correct'); gramEScore++; }
+        else { btn.classList.add('wrong'); div.querySelectorAll('.mc-option')[item.ans].classList.add('correct'); }
+      };
+      div.appendChild(btn);
+    });
+    c.appendChild(div);
+  });
+}
+
+function checkLevel3() {
+  let pts=0;
+  // Task A: drag zones
+  const dzIds=['dz-a1','dz-a2','dz-a3','dz-a4','dz-a5','dz-a6'];
+  dzIds.forEach(id=>{
+    const z=document.getElementById(id);
+    if(z && z.dataset.placed && z.dataset.placed===z.dataset.correct) pts++;
+  });
+  // Task B
+  pts += gramBScore;
+  // Task C: relative clauses
+  const rcAnswers=[['where'],['who'],['which','that',''],['where','which'],['which','that','']];
+  ['rc1','rc2','rc3','rc4','rc5'].forEach((id,i)=>{
+    const v=document.getElementById(id).value.trim().toLowerCase();
+    const ok=rcAnswers[i].includes(v);
+    document.getElementById(id).classList.toggle('correct-gf',ok);
+    document.getElementById(id).classList.toggle('wrong-gf',!ok);
+    if(ok) pts++;
+  });
+  // Task D: past progressive vs simple past
+  const ppAnswers=['was swimming','rang','was reading','went','were having','started'];
+  ['pp1','pp2','pp3','pp4','pp5','pp6'].forEach((id,i)=>{
+    const v=document.getElementById(id).value.trim().toLowerCase().replace(/['']/g,"'");
+    const ok=v===ppAnswers[i];
+    document.getElementById(id).classList.toggle('correct-gf',ok);
+    document.getElementById(id).classList.toggle('wrong-gf',!ok);
+    if(ok) pts++;
+  });
+  // Task E
+  pts += gramEScore;
+  // Max possible: 6+3+5+6+4=24 → scale to 30
+  pts = Math.round((pts/24)*30);
+  addScore(3, pts);
+  state.done.l3=true;
+  document.getElementById('l3-score-msg').textContent=`Grammar score: ${pts}/30 points. ${pts>=25?'🌟 Grammar star!':pts>=18?'👍 Great work!':'Good effort – review the grammar rules!'}`;
+  document.getElementById('complete-3').classList.add('show');
+  document.getElementById('complete-3').scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// ═══  LEVEL 4: RIDDLES  ══════════════════
+// ═══════════════════════════════════════════
+const riddles = [
+  { q:'I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?', opts:['A ghost','An echo','A whisper','A shadow'], ans:1 },
+  { q:'The person who makes me doesn\'t want me. The person who buys me doesn\'t use me. The person who uses me doesn\'t know it. What am I?', opts:['A present','A coffin','A secret','A surprise'], ans:1 },
+  { q:'I have lakes with no water, mountains with no stone, and cities with no buildings. What am I?', opts:['A dream','A painting','A map','A photograph'], ans:2 },
+  { q:'I can be cracked, made, told and played. What am I?', opts:['A promise','A joke','A record','A deal'], ans:1 },
+  { q:'I get shorter every time I give you light. What am I?', opts:['The sun','A star','A candle','A lamp'], ans:2 },
+  { q:'You see me once in June, twice in November, but never in May. What am I?', opts:['Summer','Rain','The letter E','A holiday'], ans:2 },
+  { q:'I have a head and a tail but no body. What am I?', opts:['A snake','A comet','A coin','A worm'], ans:2 },
+  { q:'The more you have of me, the less you see. What am I?', opts:['Money','Darkness','Time','Fog'], ans:1 },
+];
+let riddleScore=0;
+function buildRiddles() {
+  const c=document.getElementById('riddles-container');
+  riddles.forEach((r,i)=>{
+    const div=document.createElement('div'); div.className='riddle-card';
+    div.innerHTML=`<h4>🔮 Riddle ${i+1}</h4><p class="riddle-text">${r.q}</p><div class="riddle-options" id="ro-${i}"></div><div class="feedback-box" id="rf-${i}"></div>`;
+    c.appendChild(div);
+    const row=document.getElementById('ro-'+i);
+    r.opts.forEach((opt,j)=>{
+      const btn=document.createElement('button'); btn.className='riddle-btn'; btn.textContent=opt;
+      btn.onclick=()=>{
+        if(div.dataset.done) return; div.dataset.done='1';
+        const fb=document.getElementById('rf-'+i);
+        if(j===r.ans){
+          btn.classList.add('correct');
+          fb.textContent='✅ Correct! Well done!'; fb.className='feedback-box correct show';
+          riddleScore++;
+          if(riddleScore===riddles.length) setTimeout(autoCompleteRiddles,600);
+        } else {
+          btn.classList.add('wrong');
+          row.querySelectorAll('.riddle-btn')[r.ans].classList.add('correct');
+          fb.textContent='❌ Not quite! The answer was: '+r.opts[r.ans]; fb.className='feedback-box wrong show';
+        }
+      };
+      row.appendChild(btn);
+    });
+  });
+}
+function autoCompleteRiddles() {
+  const pts=riddleScore*2;
+  addScore(4,pts);
+  state.done.l4=true;
+  document.getElementById('l4-score-msg').textContent=`You solved ${riddleScore}/8 riddles! That's ${pts} points! ${pts>=14?'🌟 Amazing mind!':pts>=8?'👍 Nice work!':'Keep training your brain!'}`;
+  document.getElementById('complete-4').classList.add('show');
+  document.getElementById('complete-4').scrollIntoView({behavior:'smooth'});
+}
+// Also let teacher manually complete
+function checkRiddlesDone() {
+  let allDone=true;
+  riddles.forEach((_,i)=>{ if(!document.getElementById('ro-'+i).closest('.riddle-card').dataset.done) allDone=false; });
+  if(allDone && !state.done.l4) autoCompleteRiddles();
+}
+
+// ═══════════════════════════════════════════
+// ═══  LEVEL 5: SPEAKING  ═════════════════
+// ═══════════════════════════════════════════
+const speakingCards = [
+  {
+    emoji:'🏖️', title:'Plan the Perfect Summer Holiday',
+    prompts:['Where would you go and why?','What would you do there?','What would you pack?','How would you travel?','What food would you try?']
+  },
+  {
+    emoji:'🧳', title:'What to Pack?',
+    prompts:['You can only take ONE small suitcase – what goes in?','What is absolutely essential?','What would you leave at home?','Your partner disagrees – convince them!','What happens if you forget something important?']
+  },
+  {
+    emoji:'🚨', title:'Holiday Problem Solvers',
+    prompts:['Your flight is cancelled – what do you do?','You lose your passport at the beach!','You are lost in a foreign city.','The hotel room is awful – complain politely!','You run out of money on the last day – help!']
+  }
+];
+let selectedSpeakingCard=null;
+let timerInterval=null, timerRunning=false, timerSeconds=150;
+const TIMER_TOTAL=150;
+
+function buildSpeaking() {
+  const c=document.getElementById('speaking-cards-container');
+  speakingCards.forEach((card,i)=>{
+    const div=document.createElement('div'); div.className='speaking-card';
+    div.innerHTML=`<h4>${card.emoji} ${card.title}</h4><ul>${card.prompts.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+    div.onclick=()=>selectSpeakingCard(i,div);
+    c.appendChild(div);
+  });
+}
+
+function selectSpeakingCard(i,el) {
+  document.querySelectorAll('.speaking-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  selectedSpeakingCard=i;
+  const card=speakingCards[i];
+  document.getElementById('sc-title').textContent=card.emoji+' '+card.title;
+  const ul=document.getElementById('sc-prompts'); ul.innerHTML='';
+  card.prompts.forEach(p=>{ const li=document.createElement('li'); li.textContent=p; li.style.marginBottom='4px'; ul.appendChild(li); });
+  document.getElementById('selected-card-display').style.display='block';
+}
+
+function toggleTimer() {
+  if(!timerRunning){
+    timerRunning=true;
+    document.getElementById('timer-btn').textContent='⏸ Pause';
+    timerInterval=setInterval(()=>{
+      timerSeconds--;
+      updateTimerDisplay();
+      if(timerSeconds<=0){ clearInterval(timerInterval); timerRunning=false; document.getElementById('timer-btn').textContent='✅ Time\'s Up!'; }
+    },1000);
+  } else {
+    clearInterval(timerInterval); timerRunning=false;
+    document.getElementById('timer-btn').textContent='▶ Resume';
+  }
+}
+
+function updateTimerDisplay() {
+  const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('timer-fill').style.width=(timerSeconds/TIMER_TOTAL*100)+'%';
+  if(timerSeconds<=30) document.getElementById('timer-fill').style.background='var(--coral)';
+}
+
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning=false; timerSeconds=TIMER_TOTAL;
+  document.getElementById('timer-display').textContent='2:30';
+  document.getElementById('timer-fill').style.width='100%';
+  document.getElementById('timer-fill').style.background='var(--pink)';
+  document.getElementById('timer-btn').textContent='▶ Start Timer';
+}
+
+function claimSpeaking() {
+  addScore(5,20);
+  state.done.l5=true;
+  document.getElementById('l5-score-msg').textContent=`Bonus +20 points! Total score: ${totalScore()} points! 🎉`;
+  document.getElementById('complete-5').classList.add('show');
+  document.getElementById('complete-5').scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// CERTIFICATE
+// ═══════════════════════════════════════════
+function showCertificate() {
+  const cert=document.getElementById('certificate');
+  cert.classList.add('show');
+  cert.scrollIntoView({behavior:'smooth'});
+  document.getElementById('cert-total').textContent=totalScore();
+  const lvlNames=['Vocabulary','Reading','Grammar','Riddles','Speaking'];
+  const cs=document.getElementById('cert-scores-display');
+  cs.innerHTML='';
+  Object.entries(state.score).forEach(([k,v],i)=>{
+    const span=document.createElement('span'); span.className='cert-score-pill';
+    span.style.background=['#BAE6FD','#A7F3D0','#FED7AA','#EDE9FE','#FCE7F3'][i];
+    span.textContent=`${lvlNames[i]}: ${v} pts`;
+    cs.appendChild(span);
+  });
+  document.getElementById('dot-5').classList.remove('active');
+  document.getElementById('dot-5').classList.add('done');
+  launchConfetti();
+}
+
+// ═══════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════
+function launchConfetti() {
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const pieces=[];
+  const colors=['#FACC15','#0EA5E9','#F97316','#34D399','#A855F7','#EC4899'];
+  for(let i=0;i<120;i++) pieces.push({
+    x:Math.random()*canvas.width, y:Math.random()*-canvas.height,
+    r:Math.random()*8+4, c:colors[Math.floor(Math.random()*colors.length)],
+    vx:(Math.random()-0.5)*4, vy:Math.random()*5+3,
+    rot:Math.random()*360, vrot:(Math.random()-0.5)*8
+  });
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vrot;
+    });
+    frame++;
+    if(frame<180) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  buildMatching();
+  buildVocabMC();
+  buildWordSearch();
+  buildReading();
+  buildGrammar();
+  buildRiddles();
+  buildSpeaking();
+});
+</script>
+</body>
+</html>
